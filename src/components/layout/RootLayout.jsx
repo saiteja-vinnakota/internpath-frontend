@@ -12,9 +12,15 @@ function RootLayout({
       "
     >
 
+      {/* NAVBAR */}
       <Topbar />
 
-      <main>
+      {/* PAGE CONTENT */}
+      <main
+        className="
+          relative
+        "
+      >
         {children}
       </main>
 
