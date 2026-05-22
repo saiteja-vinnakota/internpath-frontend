@@ -1,12 +1,7 @@
-import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/Home";
+import Register from "./pages/Register";
 
 function App() {
-  return (
-    <MainLayout>
-      <Home />
-    </MainLayout>
-  );
+  return <Register />;
 }
 
 export default App;
