@@ -3,51 +3,64 @@ import {
   BriefcaseBusiness,
   Bookmark,
   FileText,
-  Settings,
+  User,
+  LogOut,
 } from "lucide-react";
 
-import {
-  Link,
-  useLocation,
-} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import Avatar from "../ui/Avatar";
 
-function Sidebar() {
+import { useAuth } from "../../context/AuthContext";
 
-  const location =
-    useLocation();
+function Sidebar() {
+  const location = useLocation();
+
+  const {
+    user,
+
+    logout,
+  } = useAuth();
 
   const navItems = [
-
     {
       label: "Dashboard",
+
       icon: LayoutDashboard,
+
       path: "/student/dashboard",
     },
 
     {
       label: "Internships",
+
       icon: BriefcaseBusiness,
+
       path: "/jobs",
     },
 
     {
-      label: "Applications",
-      icon: FileText,
-      path: "/student/applications",
-    },
-
-    {
       label: "Saved Jobs",
+
       icon: Bookmark,
+
       path: "/student/saved",
     },
 
     {
-      label: "Settings",
-      icon: Settings,
-      path: "/settings",
+      label: "Applications",
+
+      icon: FileText,
+
+      path: "/student/applications",
+    },
+
+    {
+      label: "Profile",
+
+      icon: User,
+
+      path: "/student/profile",
     },
   ];
 
@@ -64,7 +77,6 @@ function Sidebar() {
         flex-col
       "
     >
-
       {/* LOGO */}
       <Link
         to="/"
@@ -74,7 +86,6 @@ function Sidebar() {
           gap-3
         "
       >
-
         <div
           className="
             w-10
@@ -86,7 +97,6 @@ function Sidebar() {
             justify-center
           "
         >
-
           <svg
             viewBox="0 0 18 18"
             className="w-5 h-5"
@@ -97,13 +107,8 @@ function Sidebar() {
           >
             <path d="M3 14l3-4 3 2 3-5 3 4" />
 
-            <circle
-              cx="9"
-              cy="4"
-              r="1.5"
-            />
+            <circle cx="9" cy="4" r="1.5" />
           </svg>
-
         </div>
 
         <h1
@@ -115,7 +120,6 @@ function Sidebar() {
         >
           InternPath
         </h1>
-
       </Link>
 
       {/* NAVIGATION */}
@@ -125,15 +129,10 @@ function Sidebar() {
           space-y-2
         "
       >
-
         {navItems.map((item) => {
+          const Icon = item.icon;
 
-          const Icon =
-            item.icon;
-
-          const isActive =
-            location.pathname ===
-            item.path;
+          const isActive = location.pathname === item.path;
 
           return (
             <Link
@@ -151,12 +150,19 @@ function Sidebar() {
 
                 ${
                   isActive
-                    ? "bg-primary text-white"
-                    : "text-muted hover:bg-stone hover:text-primary"
+                    ? `
+                      bg-primary
+                      text-white
+                      shadow-sm
+                    `
+                    : `
+                      text-muted
+                      hover:bg-stone
+                      hover:text-primary
+                    `
                 }
               `}
             >
-
               <Icon size={20} />
 
               <span
@@ -167,59 +173,85 @@ function Sidebar() {
               >
                 {item.label}
               </span>
-
             </Link>
           );
         })}
-
       </nav>
 
       {/* PROFILE */}
       <div className="mt-auto">
-
         <div
           className="
             p-4
             rounded-3xl
             bg-stone
-            flex
-            items-center
-            gap-4
           "
         >
+          {/* USER */}
+          <Link
+            to="/student/profile"
+            className="
+              flex
+              items-center
+              gap-4
+            "
+          >
+            <Avatar src={user?.profilePicture} alt={user?.name} />
 
-          <Avatar
-            alt="Sai Teja"
-          />
-
-          <div>
-
-            <h3
+            <div
               className="
-                text-sm
-                font-semibold
-                text-primary
+                min-w-0
               "
             >
-              Sai Teja
-            </h3>
+              <h3
+                className="
+                  text-sm
+                  font-semibold
+                  text-primary
+                  truncate
+                "
+              >
+                {user?.name || "Student"}
+              </h3>
 
-            <p
-              className="
-                text-xs
-                text-muted
-                mt-1
-              "
-            >
-              Student Account
-            </p>
+              <p
+                className="
+                  text-xs
+                  text-muted
+                  mt-1
+                  truncate
+                "
+              >
+                {user?.email}
+              </p>
+            </div>
+          </Link>
 
-          </div>
+          {/* LOGOUT */}
+          <button
+            onClick={logout}
+            className="
+              mt-5
+              w-full
+              flex
+              items-center
+              justify-center
+              gap-2
+              h-11
+              rounded-2xl
+              text-sm
+              font-medium
+              text-red-500
+              hover:bg-red-50
+              transition-all
+            "
+          >
+            <LogOut size={18} />
 
+            <span>Logout</span>
+          </button>
         </div>
-
       </div>
-
     </aside>
   );
 }

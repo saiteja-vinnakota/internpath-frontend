@@ -1,49 +1,77 @@
+import Spinner from "./Spinner";
+
 function Button({
+
   children,
-  className = "",
+
   variant = "primary",
+
+  className = "",
+
+  loading = false,
+
+  disabled = false,
+
   ...props
+
 }) {
 
   const variants = {
 
-    primary:
-      "bg-primary text-white hover:bg-black",
+    primary: `
+      bg-primary
+      text-white
+      hover:bg-black
+    `,
 
-    secondary:
-      "bg-stone border border-border hover:bg-white",
+    outline: `
+      border
+      border-border
+      bg-white
+      text-primary
+      hover:bg-stone
+    `,
 
-    white:
-      "bg-white text-primary hover:bg-stone",
-
-    outline:
-      "border border-border bg-transparent hover:bg-stone",
-
-    ghost:
-      "hover:bg-stone",
+    white: `
+      bg-white
+      text-primary
+      hover:bg-stone
+    `,
   };
 
   return (
     <button
       className={`
-        h-11
-        px-5
+        h-12
+        px-6
         rounded-2xl
-        text-sm
         font-medium
         transition-all
         duration-200
-        disabled:opacity-50
+        flex
+        items-center
+        justify-center
+        gap-3
+        disabled:opacity-60
         disabled:cursor-not-allowed
 
         ${variants[variant]}
 
         ${className}
       `}
+      disabled={
+        loading || disabled
+      }
       {...props}
     >
 
-      {children}
+      {loading && (
+        <Spinner size="sm" />
+      )}
+
+      <span>
+        {children}
+      </span>
 
     </button>
   );
