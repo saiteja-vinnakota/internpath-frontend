@@ -55,7 +55,6 @@ export function AuthProvider({
         const data =
           await getProfile();
 
-
         // SET USER
         setUser(
           data.data
@@ -212,6 +211,8 @@ export function AuthProvider({
       value={{
 
         user,
+
+        setUser,
 
         loading,
 

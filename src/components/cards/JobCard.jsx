@@ -8,57 +8,58 @@ import {
   Loader2,
 } from "lucide-react";
 
-import {
-  Link,
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import toast
-from "react-hot-toast";
+import toast from "react-hot-toast";
 
-import Badge
-from "../ui/Badge";
+import Badge from "../ui/Badge";
 
-import useAIMatch
-from "../../hooks/useAIMatch";
+import useAIMatch from "../../hooks/useAIMatch";
 
-import {
-  useAuth,
-} from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 function JobCard({
   job,
-}) {
 
-  const { user } =
-    useAuth();
+  isSaved = false,
+
+  onSave,
+
+  onRemove,
+}) {
+  const { user } = useAuth();
 
   const {
-
     score,
 
     loading,
 
     fetchScore,
-
   } = useAIMatch();
 
-  // HANDLE SCORE
-  const handleScore =
-    async (e) => {
+  // HANDLE AI SCORE
+  const handleScore = async (e) => {
+    e.preventDefault();
 
-      e.preventDefault();
+    if (!user?.resumeUrl) {
+      toast.error("Upload resume to get AI score");
 
-      if (!user?.resumeUrl) {
+      return;
+    }
 
-        toast.error(
-          "Upload resume to get AI score"
-        );
+    fetchScore(job._id);
+  };
 
-        return;
-      }
+  // HANDLE SAVE
+  const handleSave = (e) => {
+    e.preventDefault();
 
-      fetchScore(job._id);
-    };
+    if (isSaved) {
+      onRemove?.(job._id);
+    } else {
+      onSave?.(job._id);
+    }
+  };
 
   return (
     <Link
@@ -68,7 +69,6 @@ function JobCard({
         group
       "
     >
-
       <div
         className="
           bg-white
@@ -82,7 +82,6 @@ function JobCard({
           hover:shadow-medium
         "
       >
-
         {/* TOP */}
         <div
           className="
@@ -92,10 +91,8 @@ function JobCard({
             gap-5
           "
         >
-
           {/* LEFT */}
           <div className="flex-1">
-
             {/* COMPANY */}
             <p
               className="
@@ -121,11 +118,9 @@ function JobCard({
               {job.title}
             </h2>
 
-            {/* SCORE */}
+            {/* AI SCORE */}
             <div className="mt-4">
-
               {score ? (
-
                 <div
                   className="
                     inline-flex
@@ -140,26 +135,14 @@ function JobCard({
                     font-semibold
                   "
                 >
+                  <Sparkles size={16} />
 
-                  <Sparkles
-                    size={16}
-                  />
-
-                  <span>
-                    {score}% Score
-                  </span>
-
+                  <span>{score}% Score</span>
                 </div>
-
               ) : (
-
                 <button
-                  onClick={
-                    handleScore
-                  }
-                  disabled={
-                    loading
-                  }
+                  onClick={handleScore}
+                  disabled={loading}
                   className="
                     inline-flex
                     items-center
@@ -176,45 +159,26 @@ function JobCard({
                     hover:text-accent
                   "
                 >
-
                   {loading ? (
-
                     <Loader2
                       size={16}
                       className="
                         animate-spin
                       "
                     />
-
                   ) : (
-
-                    <Sparkles
-                      size={16}
-                    />
-
+                    <Sparkles size={16} />
                   )}
 
-                  <span>
-
-                    {loading
-                      ? "Loading..."
-                      : "Get Score"}
-
-                  </span>
-
+                  <span>{loading ? "Loading..." : "Get Score"}</span>
                 </button>
-
               )}
-
             </div>
-
           </div>
 
-          {/* SAVE */}
+          {/* SAVE BUTTON */}
           <button
-            onClick={(e) => {
-              e.preventDefault();
-            }}
+            onClick={handleSave}
             className="
               w-11
               h-11
@@ -224,17 +188,25 @@ function JobCard({
               flex
               items-center
               justify-center
-              text-muted
               transition-all
               hover:bg-stone
-              hover:text-primary
             "
           >
-
-            <Bookmark size={18} />
-
+            <Bookmark
+              size={18}
+              className={
+                isSaved
+                  ? `
+                    fill-primary
+                    text-primary
+                  `
+                  : `
+                    text-muted
+                    hover:text-primary
+                  `
+              }
+            />
           </button>
-
         </div>
 
         {/* DESCRIPTION */}
@@ -246,8 +218,7 @@ function JobCard({
             line-clamp-3
           "
         >
-          {job.description ||
-            "No description available."}
+          {job.description || "No description available."}
         </p>
 
         {/* SKILLS */}
@@ -259,17 +230,9 @@ function JobCard({
             gap-3
           "
         >
-
-          {job.requiredSkills
-            ?.slice(0, 4)
-            .map((skill) => (
-
-              <Badge key={skill}>
-                {skill}
-              </Badge>
-
-            ))}
-
+          {job.requiredSkills?.slice(0, 4).map((skill) => (
+            <Badge key={skill}>{skill}</Badge>
+          ))}
         </div>
 
         {/* META */}
@@ -284,7 +247,6 @@ function JobCard({
             text-muted
           "
         >
-
           {/* LOCATION */}
           <div
             className="
@@ -293,13 +255,9 @@ function JobCard({
               gap-2
             "
           >
-
             <MapPin size={16} />
 
-            <span>
-              {job.location || "Remote"}
-            </span>
-
+            <span>{job.location || "Remote"}</span>
           </div>
 
           {/* TYPE */}
@@ -310,10 +268,7 @@ function JobCard({
               gap-2
             "
           >
-
-            <BriefcaseBusiness
-              size={16}
-            />
+            <BriefcaseBusiness size={16} />
 
             <span
               className="
@@ -322,7 +277,6 @@ function JobCard({
             >
               {job.type}
             </span>
-
           </div>
 
           {/* DEADLINE */}
@@ -333,23 +287,14 @@ function JobCard({
               gap-2
             "
           >
-
             <Clock3 size={16} />
 
             <span>
-
               {job.deadline
-
-                ? `Apply before ${new Date(
-                    job.deadline
-                  ).toLocaleDateString()}`
-
+                ? `Apply before ${new Date(job.deadline).toLocaleDateString()}`
                 : "Applications open"}
-
             </span>
-
           </div>
-
         </div>
 
         {/* FOOTER */}
@@ -365,10 +310,8 @@ function JobCard({
             gap-4
           "
         >
-
           {/* STIPEND */}
           <div>
-
             <p
               className="
                 text-sm
@@ -389,18 +332,10 @@ function JobCard({
                 text-primary
               "
             >
+              <IndianRupee size={18} />
 
-              <IndianRupee
-                size={18}
-              />
-
-              <span>
-                {job.stipend ||
-                  "Unpaid"}
-              </span>
-
+              <span>{job.stipend || "Unpaid"}</span>
             </div>
-
           </div>
 
           {/* CTA */}
@@ -420,11 +355,8 @@ function JobCard({
           >
             View Details
           </div>
-
         </div>
-
       </div>
-
     </Link>
   );
 }

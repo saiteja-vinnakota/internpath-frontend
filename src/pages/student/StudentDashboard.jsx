@@ -1,39 +1,28 @@
-import DashboardLayout
-from "../../components/layout/DashboardLayout";
+import DashboardLayout from "../../components/layout/DashboardLayout";
 
-import PageHeader
-from "../../components/layout/PageHeader";
+import PageHeader from "../../components/layout/PageHeader";
 
-import StatCard
-from "../../components/cards/StatCard";
+import StatCard from "../../components/cards/StatCard";
 
-import JobCard
-from "../../components/cards/JobCard";
+import JobCard from "../../components/cards/JobCard";
 
-import Skeleton
-from "../../components/ui/Skeleton";
+import Skeleton from "../../components/ui/Skeleton";
 
-import EmptyState
-from "../../components/ui/EmptyState";
+import EmptyState from "../../components/ui/EmptyState";
 
-import useJobs
-from "../../hooks/useJobs";
+import useJobs from "../../hooks/useJobs";
 
 function StudentDashboard() {
-
   const {
-
     jobs,
 
     loading,
-
   } = useJobs({
     limit: 4,
   });
 
   return (
     <DashboardLayout>
-
       {/* HEADER */}
       <PageHeader
         title="Student Dashboard"
@@ -53,7 +42,6 @@ function StudentDashboard() {
           gap-6
         "
       >
-
         <StatCard
           title="Applications"
           value="12"
@@ -68,12 +56,10 @@ function StudentDashboard() {
           title="AI Match Score"
           value="91%"
         />
-
       </div>
 
       {/* RECOMMENDED JOBS */}
       <div className="mt-10">
-
         {/* SECTION HEADER */}
         <div
           className="
@@ -83,7 +69,6 @@ function StudentDashboard() {
             mb-6
           "
         >
-
           <h2
             className="
               text-3xl
@@ -93,12 +78,10 @@ function StudentDashboard() {
           >
             Recommended Jobs
           </h2>
-
         </div>
 
         {/* LOADING */}
         {loading ? (
-
           <div
             className="
               grid
@@ -107,25 +90,93 @@ function StudentDashboard() {
               gap-6
             "
           >
-
-            {[...Array(4)].map(
-              (_, index) => (
-
+            {[...Array(4)].map((_, index) => (
+              <div
+                key={index}
+                className="
+                  p-7
+                  rounded-[32px]
+                  bg-white
+                  border
+                  border-border
+                  space-y-5
+                "
+              >
+                {/* COMPANY */}
                 <Skeleton
-                  key={index}
                   className="
-                    h-[260px]
-                    rounded-[32px]
+                    h-4
+                    w-24
                   "
                 />
 
-              )
-            )}
+                {/* TITLE */}
+                <Skeleton
+                  className="
+                    h-8
+                    w-3/4
+                  "
+                />
 
+                {/* DESCRIPTION */}
+                <Skeleton
+                  className="
+                    h-20
+                    w-full
+                  "
+                />
+
+                {/* SKILLS */}
+                <div className="flex gap-3">
+                  <Skeleton
+                    className="
+                      h-8
+                      w-20
+                    "
+                  />
+
+                  <Skeleton
+                    className="
+                      h-8
+                      w-20
+                    "
+                  />
+
+                  <Skeleton
+                    className="
+                      h-8
+                      w-20
+                    "
+                  />
+                </div>
+
+                {/* FOOTER */}
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    pt-4
+                  "
+                >
+                  <Skeleton
+                    className="
+                      h-10
+                      w-32
+                    "
+                  />
+
+                  <Skeleton
+                    className="
+                      h-10
+                      w-28
+                    "
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-
         ) : jobs.length === 0 ? (
-
           <EmptyState
             title="No jobs found"
             description="
@@ -133,9 +184,7 @@ function StudentDashboard() {
               at the moment.
             "
           />
-
         ) : (
-
           <div
             className="
               grid
@@ -144,22 +193,15 @@ function StudentDashboard() {
               gap-6
             "
           >
-
             {jobs.map((job) => (
-
               <JobCard
                 key={job._id}
                 job={job}
               />
-
             ))}
-
           </div>
-
         )}
-
       </div>
-
     </DashboardLayout>
   );
 }

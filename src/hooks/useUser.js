@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -7,40 +6,21 @@ import toast
 from "react-hot-toast";
 
 import {
-  getCurrentUser,
   updateUserProfile,
 } from "../api/userApi";
 
+import {
+  useAuth,
+} from "../context/AuthContext";
+
 function useUser() {
 
-  const [user, setUser] =
-    useState(null);
+  const {
+    setUser,
+  } = useAuth();
 
   const [loading, setLoading] =
-    useState(true);
-
-  // FETCH USER
-  const fetchUser =
-    async () => {
-
-      try {
-
-        setLoading(true);
-
-        const data =
-          await getCurrentUser();
-
-        setUser(data.data);
-
-      } catch (err) {
-
-        console.log(err);
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+    useState(false);
 
   // UPDATE PROFILE
   const updateProfile =
@@ -55,7 +35,10 @@ function useUser() {
             formData
           );
 
-        setUser(data.data);
+        // UPDATE GLOBAL AUTH USER
+        setUser(
+          data.data
+        );
 
         toast.success(
           "Profile updated successfully"
@@ -81,21 +64,11 @@ function useUser() {
       }
     };
 
-  useEffect(() => {
-
-    fetchUser();
-
-  }, []);
-
   return {
-
-    user,
 
     loading,
 
     updateProfile,
-
-    fetchUser,
   };
 }
 

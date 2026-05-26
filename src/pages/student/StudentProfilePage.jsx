@@ -16,17 +16,22 @@ from "../../components/ui/Skeleton";
 import useUser
 from "../../hooks/useUser";
 
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
 function StudentProfilePage() {
 
-  const {
+  // GLOBAL AUTH USER
+  const { user } =
+    useAuth();
 
-    user,
+  // USER OPERATIONS
+  const {
 
     loading,
 
     updateProfile,
-
-    fetchUser,
 
   } = useUser();
 
@@ -35,12 +40,70 @@ function StudentProfilePage() {
     return (
       <DashboardLayout>
 
-        <Skeleton
+        <div
           className="
-            h-[700px]
+            bg-white
+            border
+            border-border
             rounded-[32px]
+            p-8
+            space-y-8
           "
-        />
+        >
+
+          {/* HEADER */}
+          <div className="space-y-4">
+
+            <Skeleton
+              className="
+                h-8
+                w-52
+              "
+            />
+
+            <Skeleton
+              className="
+                h-5
+                w-80
+              "
+            />
+
+          </div>
+
+          {/* FORM */}
+          <div className="space-y-6">
+
+            <Skeleton
+              className="
+                h-14
+                w-full
+              "
+            />
+
+            <Skeleton
+              className="
+                h-14
+                w-full
+              "
+            />
+
+            <Skeleton
+              className="
+                h-14
+                w-full
+              "
+            />
+
+            <Skeleton
+              className="
+                h-40
+                w-full
+              "
+            />
+
+          </div>
+
+        </div>
 
       </DashboardLayout>
     );
@@ -80,9 +143,6 @@ function StudentProfilePage() {
         {/* RESUME */}
         <ResumeUploadForm
           user={user}
-          onUploadSuccess={
-            fetchUser
-          }
         />
 
       </div>

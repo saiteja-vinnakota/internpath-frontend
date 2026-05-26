@@ -1,48 +1,44 @@
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
-import toast
-from "react-hot-toast";
+import toast from "react-hot-toast";
 
 import {
   applyToJob,
+  getMyApplications,
 } from "../api/applicationApi";
 
 function useApplications() {
 
+  const [applications, setApplications] =
+    useState([]);
+
   const [loading, setLoading] =
     useState(false);
 
-  // APPLY
-  const apply =
-    async (jobId) => {
+  const [applyingJobId, setApplyingJobId] =
+    useState(null);
+
+  // FETCH APPLICATIONS
+  const fetchApplications =
+    async () => {
 
       try {
 
         setLoading(true);
 
-        const data =
-          await applyToJob(
-            jobId
-          );
+        const response =
+          await getMyApplications();
 
-        toast.success(
-          "Application submitted successfully"
+        setApplications(
+          response.data || []
         );
 
-        return data;
+      } catch (error) {
 
-      } catch (err) {
-
-        console.log(err);
+        console.log(error);
 
         toast.error(
-
-          err.response?.data
-            ?.message ||
-
-          "Failed to apply"
+          "Failed to load applications"
         );
 
       } finally {
@@ -51,11 +47,76 @@ function useApplications() {
       }
     };
 
+  // CHECK ALREADY APPLIED
+  const hasApplied =
+    (jobId) => {
+
+      return applications.some(
+
+        (application) =>
+
+          application.job?._id ===
+          jobId
+
+      );
+    };
+
+  // APPLY TO JOB
+  const handleApply =
+    async (jobId) => {
+
+      try {
+
+        setApplyingJobId(jobId);
+
+        const response =
+          await applyToJob(jobId);
+
+        toast.success(
+
+          response.message ||
+          "Application submitted"
+
+        );
+
+        // REFRESH APPLICATIONS
+        await fetchApplications();
+
+        return true;
+
+      } catch (error) {
+
+        console.log(error);
+
+        toast.error(
+
+          error.response?.data
+            ?.message ||
+
+          "Failed to apply"
+        );
+
+        return false;
+
+      } finally {
+
+        setApplyingJobId(null);
+      }
+    };
+
   return {
+
+    applications,
 
     loading,
 
-    apply,
+    applyingJobId,
+
+    fetchApplications,
+
+    handleApply,
+
+    hasApplied,
   };
 }
 

@@ -15,6 +15,10 @@ import {
   uploadResume,
 } from "../../api/resumeApi";
 
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
 function ResumeUploadForm({
 
   user,
@@ -22,6 +26,9 @@ function ResumeUploadForm({
   onUploadSuccess,
 
 }) {
+
+  const { setUser } =
+    useAuth();
 
   const [file, setFile] =
     useState(null);
@@ -73,8 +80,16 @@ function ResumeUploadForm({
 
         setLoading(true);
 
-        await uploadResume(
-          file
+        const response =
+          await uploadResume(
+            file
+          );
+
+          console.log(response);
+
+        // UPDATE AUTH USER
+        setUser(
+          response.data
         );
 
         toast.success(
@@ -297,4 +312,5 @@ function ResumeUploadForm({
     </div>
   );
 }
+
 export default ResumeUploadForm;

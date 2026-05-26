@@ -20,6 +20,10 @@ import JobDetailPage from "./pages/student/JobDetailPage";
 
 import StudentProfilePage from "./pages/student/StudentProfilePage";
 
+import SavedJobs from "./pages/student/SavedJobsPage";
+
+import MyApplicationsPage from "./pages/student/MyApplicationsPage";
+
 function App() {
   return (
     <Routes>
@@ -88,6 +92,25 @@ function App() {
         element={
           <ProtectedRoute>
             <StudentProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* SAVED JOBS */}
+      <Route
+        path="/student/saved"
+        element={
+          <ProtectedRoute>
+            <SavedJobs />
+          </ProtectedRoute>
+        }
+      />
+      {/* MY APPLICATIONS */}
+      <Route
+        path="/student/applications"
+        element={
+          <ProtectedRoute>
+            <MyApplicationsPage />
           </ProtectedRoute>
         }
       />

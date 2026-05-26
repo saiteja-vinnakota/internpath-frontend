@@ -8,21 +8,21 @@ import {
   Loader2,
 } from "lucide-react";
 
-import toast
-from "react-hot-toast";
+import {
+  useEffect,
+} from "react";
 
-import Badge
-from "../ui/Badge";
+import toast from "react-hot-toast";
 
-import Button
-from "../ui/Button";
+import Badge from "../ui/Badge";
+
+import Button from "../ui/Button";
 
 import {
   useAuth,
 } from "../../context/AuthContext";
 
-import useApplications
-from "../../hooks/useApplications";
+import useApplications from "../../hooks/useApplications";
 
 function JobDetailPanel({
   job,
@@ -30,13 +30,30 @@ function JobDetailPanel({
 
   const { user } =
     useAuth();
+
   const {
 
-    loading,
+    applications,
 
-    apply,
+    applyingJobId,
+
+    fetchApplications,
+
+    handleApply:
+      applyToCurrentJob,
+
+    hasApplied,
 
   } = useApplications();
+
+  useEffect(() => {
+
+    fetchApplications();
+
+  }, []);
+
+  const alreadyApplied =
+    hasApplied(job._id);
 
   // APPLY HANDLER
   const handleApply =
@@ -54,7 +71,9 @@ function JobDetailPanel({
         return;
       }
 
-      await apply(job._id);
+      await applyToCurrentJob(
+        job._id
+      );
     };
 
   return (
@@ -255,7 +274,12 @@ function JobDetailPanel({
           {/* APPLY */}
           <Button
             onClick={handleApply}
-            disabled={loading}
+            disabled={
+              applyingJobId ===
+                job._id ||
+
+              alreadyApplied
+            }
             className="
               h-14
               px-8
@@ -263,7 +287,8 @@ function JobDetailPanel({
             "
           >
 
-            {loading ? (
+            {applyingJobId ===
+            job._id ? (
 
               <div
                 className="
@@ -285,6 +310,10 @@ function JobDetailPanel({
                 </span>
 
               </div>
+
+            ) : alreadyApplied ? (
+
+              "Already Applied"
 
             ) : (
 
