@@ -1,4 +1,5 @@
 import {
+  useRef,
   useState,
 } from "react";
 
@@ -8,57 +9,156 @@ import {
 
 function useAIMatch() {
 
-  const [score, setScore] =
-    useState(null);
+  const [
 
-  const [matchData, setMatchData] =
-    useState(null);
+    score,
 
-  const [loading, setLoading] =
-    useState(false);
+    setScore,
 
-  const [error, setError] =
-    useState("");
+  ] = useState(null);
+
+  const [
+
+    matchData,
+
+    setMatchData,
+
+  ] = useState(null);
+
+  const [
+
+    loading,
+
+    setLoading,
+
+  ] = useState(false);
+
+  const [
+
+    error,
+
+    setError,
+
+  ] = useState("");
+
+  // CACHE
+  const cacheRef =
+    useRef({});
 
   // FETCH AI SCORE
   const fetchScore =
-    async (jobId) => {
+    async (
+      jobId,
+      forceRefresh = false
+    ) => {
 
       try {
+
+        // INVALID
+        if (!jobId) {
+
+          return null;
+        }
+
+        // CACHE HIT
+        if (
+
+          cacheRef.current[
+            jobId
+          ] &&
+
+          !forceRefresh
+        ) {
+
+          const cachedData =
+
+            cacheRef.current[
+              jobId
+            ];
+
+          setScore(
+            cachedData.score
+          );
+
+          setMatchData(
+            cachedData
+          );
+
+          return cachedData;
+        }
 
         setLoading(true);
 
         setError("");
 
-        const data =
+        // API CALL
+        const response =
           await getAIMatch(
             jobId
           );
 
+        const data =
+          response?.data;
+
+        // SAVE STATE
         setScore(
-          data.data.score
+          data?.score || 0
         );
 
         setMatchData(
-          data.data
+          data || null
         );
+
+        // CACHE STORE
+        cacheRef.current[
+          jobId
+        ] = data;
+
+        return data;
 
       } catch (err) {
 
         console.log(err);
 
-        setError(
+        const message =
 
           err.response?.data
             ?.message ||
 
-          "Failed to fetch AI score"
-        );
+          "Failed to fetch AI score";
+
+        setError(message);
+
+        throw err;
 
       } finally {
 
         setLoading(false);
       }
+    };
+
+  // CLEAR SINGLE CACHE
+  const clearCache =
+    (jobId) => {
+
+      if (
+        cacheRef.current[
+          jobId
+        ]
+      ) {
+
+        delete
+          cacheRef.current[
+            jobId
+          ];
+      }
+    };
+
+  // CLEAR ALL CACHE
+  const clearAllCache =
+    () => {
+
+      cacheRef.current = {};
     };
 
   return {
@@ -72,6 +172,10 @@ function useAIMatch() {
     error,
 
     fetchScore,
+
+    clearCache,
+
+    clearAllCache,
   };
 }
 

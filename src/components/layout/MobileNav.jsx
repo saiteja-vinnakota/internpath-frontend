@@ -9,13 +9,23 @@ import {
   BriefcaseBusiness,
   Bookmark,
   FileText,
-  Settings,
+  User,
+  Bell,
+  PlusSquare,
 } from "lucide-react";
 
 import {
   Link,
   useLocation,
 } from "react-router-dom";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
+import {
+  useNotificationContext,
+} from "../../context/NotificationContext";
 
 function MobileNav() {
 
@@ -25,7 +35,16 @@ function MobileNav() {
   const location =
     useLocation();
 
-  const navItems = [
+  const { user } =
+    useAuth();
+
+  const {
+    unreadCount,
+  } =
+    useNotificationContext();
+
+  // STUDENT NAV
+  const studentNavItems = [
 
     {
       label: "Dashboard",
@@ -46,17 +65,66 @@ function MobileNav() {
     },
 
     {
-      label: "Saved",
+      label: "Saved Jobs",
       icon: Bookmark,
       path: "/student/saved",
     },
 
     {
-      label: "Settings",
-      icon: Settings,
-      path: "/settings",
+      label: "Notifications",
+      icon: Bell,
+      path: "/notifications",
+    },
+
+    {
+      label: "Profile",
+      icon: User,
+      path: "/student/profile",
     },
   ];
+
+  // RECRUITER NAV
+  const recruiterNavItems = [
+
+    {
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/recruiter/dashboard",
+    },
+
+    {
+      label: "Manage Listings",
+      icon: BriefcaseBusiness,
+      path: "/recruiter/manage-listings",
+    },
+
+    {
+      label: "Post Internship",
+      icon: PlusSquare,
+      path: "/recruiter/post-job",
+    },
+
+    {
+      label: "Notifications",
+      icon: Bell,
+      path: "/notifications",
+    },
+
+    {
+      label: "Profile",
+      icon: User,
+      path: "/recruiter/profile",
+    },
+  ];
+
+  const navItems =
+
+    user?.role ===
+    "recruiter"
+
+      ? recruiterNavItems
+
+      : studentNavItems;
 
   return (
     <>
@@ -79,7 +147,6 @@ function MobileNav() {
         "
       >
 
-        {/* LOGO */}
         <Link
           to="/"
           className="
@@ -109,6 +176,7 @@ function MobileNav() {
               strokeWidth="2"
               strokeLinecap="round"
             >
+
               <path d="M3 14l3-4 3 2 3-5 3 4" />
 
               <circle
@@ -116,6 +184,7 @@ function MobileNav() {
                 cy="4"
                 r="1.5"
               />
+
             </svg>
 
           </div>
@@ -132,34 +201,106 @@ function MobileNav() {
 
         </Link>
 
-        {/* MENU BUTTON */}
-        <button
-          onClick={() =>
-            setOpen(!open)
-          }
+        {/* ACTIONS */}
+        <div
           className="
-            w-10
-            h-10
-            rounded-xl
-            bg-stone
             flex
             items-center
-            justify-center
+            gap-2
           "
         >
 
-          {open ? (
-            <X size={22} />
-          ) : (
-            <Menu size={22} />
-          )}
+          {/* NOTIFICATION BUTTON */}
+          <Link
+            to="/notifications"
+            className="
+              relative
 
-        </button>
+              w-10
+              h-10
+
+              rounded-xl
+
+              bg-stone
+
+              flex
+              items-center
+              justify-center
+            "
+          >
+
+            <Bell size={18} />
+
+            {unreadCount > 0 && (
+
+              <span
+                className="
+                  absolute
+
+                  -top-1
+                  -right-1
+
+                  min-w-[18px]
+                  h-[18px]
+
+                  px-1
+
+                  rounded-full
+
+                  bg-accent
+                  text-white
+
+                  text-[10px]
+                  font-semibold
+
+                  flex
+                  items-center
+                  justify-center
+                "
+              >
+
+                {unreadCount > 99
+                  ? "99+"
+                  : unreadCount}
+
+              </span>
+
+            )}
+
+          </Link>
+
+          {/* MENU BUTTON */}
+          <button
+            onClick={() =>
+              setOpen(!open)
+            }
+            className="
+              w-10
+              h-10
+              rounded-xl
+              bg-stone
+              flex
+              items-center
+              justify-center
+            "
+          >
+
+            {open
+
+              ? <X size={22} />
+
+              : <Menu size={22} />
+            }
+
+          </button>
+
+        </div>
 
       </div>
 
       {/* OVERLAY */}
       {open && (
+
         <div
           className="
             fixed
@@ -172,6 +313,7 @@ function MobileNav() {
             setOpen(false)
           }
         />
+
       )}
 
       {/* DRAWER */}
@@ -180,20 +322,29 @@ function MobileNav() {
           fixed
           top-0
           left-0
+
           h-full
           w-[280px]
+
           bg-white
+
           z-50
+
           border-r
           border-border
+
           p-6
+
           transition-transform
           duration-300
+
           lg:hidden
 
           ${
             open
+
               ? "translate-x-0"
+
               : "-translate-x-full"
           }
         `}
@@ -247,54 +398,116 @@ function MobileNav() {
           "
         >
 
-          {navItems.map((item) => {
+          {navItems.map(
+            (item) => {
 
-            const Icon =
-              item.icon;
+              const Icon =
+                item.icon;
 
-            const isActive =
-              location.pathname ===
-              item.path;
+              const isActive =
 
-            return (
-              <Link
-                key={item.label}
-                to={item.path}
-                onClick={() =>
-                  setOpen(false)
-                }
-                className={`
-                  flex
-                  items-center
-                  gap-4
-                  px-4
-                  py-3
-                  rounded-2xl
-                  transition-all
-                  duration-200
+                location.pathname ===
+                item.path;
 
-                  ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : "text-muted hover:bg-stone hover:text-primary"
+              return (
+
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  onClick={() =>
+                    setOpen(false)
                   }
-                `}
-              >
+                  className={`
+                    flex
+                    items-center
+                    gap-4
 
-                <Icon size={20} />
+                    px-4
+                    py-3
 
-                <span
-                  className="
-                    text-sm
-                    font-medium
-                  "
+                    rounded-2xl
+
+                    transition-all
+                    duration-200
+
+                    ${
+                      isActive
+
+                        ? `
+                          bg-primary
+                          text-white
+                        `
+
+                        : `
+                          text-muted
+                          hover:bg-stone
+                          hover:text-primary
+                        `
+                    }
+                  `}
                 >
-                  {item.label}
-                </span>
 
-              </Link>
-            );
-          })}
+                  <Icon size={20} />
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      w-full
+                    "
+                  >
+
+                    <span
+                      className="
+                        text-sm
+                        font-medium
+                      "
+                    >
+                      {item.label}
+                    </span>
+
+                    {item.label ===
+                      "Notifications" &&
+
+                      unreadCount > 0 && (
+
+                      <span
+                        className="
+                          min-w-[20px]
+                          h-[20px]
+
+                          px-1
+
+                          rounded-full
+
+                          bg-accent
+                          text-white
+
+                          text-[10px]
+                          font-semibold
+
+                          flex
+                          items-center
+                          justify-center
+                        "
+                      >
+
+                        {unreadCount > 99
+                          ? "99+"
+                          : unreadCount}
+
+                      </span>
+
+                    )}
+
+                  </div>
+
+                </Link>
+
+              );
+            }
+          )}
 
         </nav>
 

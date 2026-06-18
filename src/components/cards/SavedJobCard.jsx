@@ -14,6 +14,21 @@ function SavedJobCard({
   job,
 }) {
 
+  const modeLabel =
+    job.mode === "remote"
+
+      ? "Remote"
+
+      : job.mode === "hybrid"
+
+      ? "Hybrid"
+
+      : job.mode === "onsite"
+
+      ? "On-site"
+
+      : "Not specified";
+
   return (
     <Link
       to={`/jobs/${job._id}`}
@@ -160,7 +175,7 @@ function SavedJobCard({
             <BriefcaseBusiness size={16} />
 
             <span>
-              {job.type}
+              {modeLabel}
             </span>
 
           </div>

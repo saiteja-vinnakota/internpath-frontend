@@ -10,7 +10,7 @@ import Button from "../ui/Button";
 
 import { useAuth } from "../../context/AuthContext";
 
-function RegisterForm() {
+function RegisterForm({ initialRole = "student" }) {
   const [formData, setFormData] = useState({
     name: "",
 
@@ -18,7 +18,7 @@ function RegisterForm() {
 
     password: "",
 
-    role: "student",
+    role: initialRole,
   });
 
   const {

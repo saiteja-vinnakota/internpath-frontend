@@ -1,10 +1,12 @@
-import AuthLayout
-from "../../components/layout/AuthLayout";
+import { useSearchParams } from "react-router-dom";
+import AuthLayout from "../../components/layout/AuthLayout";
 
-import RegisterForm
-from "../../components/forms/RegisterForm";
+import RegisterForm from "../../components/forms/RegisterForm";
 
 function RegisterPage() {
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get("role");
+  const initialRole = role === "recruiter" ? "recruiter" : "student";
 
   return (
     <AuthLayout
@@ -15,9 +17,7 @@ function RegisterPage() {
         and unlock AI-powered matching.
       "
     >
-
-      <RegisterForm />
-
+      <RegisterForm initialRole={initialRole} />
     </AuthLayout>
   );
 }

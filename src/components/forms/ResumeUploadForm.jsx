@@ -4,9 +4,11 @@ import {
 
 import {
   Upload,
-  FileText,
-  Loader2,
+  FileText
 } from "lucide-react";
+
+import Spinner
+from "../ui/Spinner";
 
 import toast
 from "react-hot-toast";
@@ -288,12 +290,7 @@ function ResumeUploadForm({
             "
           >
 
-            <Loader2
-              size={18}
-              className="
-                animate-spin
-              "
-            />
+            <Spinner size="sm" />
 
             <span>
               Uploading...

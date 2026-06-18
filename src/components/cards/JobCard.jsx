@@ -1,21 +1,21 @@
 import {
-  MapPin,
-  BriefcaseBusiness,
-  Clock3,
-  IndianRupee,
   Bookmark,
   Sparkles,
-  Loader2,
+  IndianRupee,
+  Users,
+  Pencil,
+  Trash2,
+  Lock,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import toast from "react-hot-toast";
-
-import Badge from "../ui/Badge";
+import Spinner from "../ui/Spinner";
+import Button from "../ui/Button";
+import JobTagList from "../job/JobTagList";
+import JobMeta from "../job/JobMeta";
 
 import useAIMatch from "../../hooks/useAIMatch";
-
 import { useAuth } from "../../context/AuthContext";
 
 function JobCard({
@@ -26,33 +26,39 @@ function JobCard({
   onSave,
 
   onRemove,
+
+  recruiterMode = false,
+
+  onDelete,
+
+  onClose,
+
+  onReopen,
 }) {
+  const navigate = useNavigate();
+
   const { user } = useAuth();
 
-  const {
-    score,
+  const { score, loading, fetchScore } = useAIMatch();
 
-    loading,
-
-    fetchScore,
-  } = useAIMatch();
-
-  // HANDLE AI SCORE
+  // AI SCORE
   const handleScore = async (e) => {
     e.preventDefault();
 
-    if (!user?.resumeUrl) {
-      toast.error("Upload resume to get AI score");
+    e.stopPropagation();
 
+    if (!user?.resumeUrl) {
       return;
     }
 
     fetchScore(job._id);
   };
 
-  // HANDLE SAVE
+  // SAVE
   const handleSave = (e) => {
     e.preventDefault();
+
+    e.stopPropagation();
 
     if (isSaved) {
       onRemove?.(job._id);
@@ -61,14 +67,44 @@ function JobCard({
     }
   };
 
+  // DELETE
+  const handleDelete = (e) => {
+    e.preventDefault();
+
+    e.stopPropagation();
+
+    onDelete?.(job._id);
+  };
+
+  // CLOSE
+  const handleClose = (e) => {
+    e.preventDefault();
+
+    e.stopPropagation();
+
+    onClose?.(job._id);
+  };
+
+  // REOPEN
+  const handleReopen = (e) => {
+    e.preventDefault();
+
+    e.stopPropagation();
+
+    onReopen?.(job._id);
+  };
+
+  // VIEW APPLICANTS
+  const handleApplicants = (e) => {
+    e.preventDefault();
+
+    e.stopPropagation();
+
+    navigate(`/recruiter/applicants/${job._id}`);
+  };
+
   return (
-    <Link
-      to={`/jobs/${job._id}`}
-      className="
-        block
-        group
-      "
-    >
+    <Link to={`/jobs/${job._id}`} className="block">
       <div
         className="
           bg-white
@@ -77,9 +113,8 @@ function JobCard({
           rounded-[32px]
           p-7
           transition-all
-          duration-300
-          hover:-translate-y-1
-          hover:shadow-medium
+          duration-200
+          hover:shadow-md
         "
       >
         {/* TOP */}
@@ -93,15 +128,62 @@ function JobCard({
         >
           {/* LEFT */}
           <div className="flex-1">
-            {/* COMPANY */}
-            <p
+            {/* COMPANY + BADGES */}
+            <div
               className="
-                text-sm
-                text-muted
+                flex
+                items-center
+                gap-3
+                flex-wrap
               "
             >
-              {job.company || "Company"}
-            </p>
+              <p
+                className="
+                  text-sm
+                  text-muted
+                "
+              >
+                {job.company || "Company"}
+              </p>
+
+              {job.category && (
+                <div
+                  className="
+                    px-3
+                    py-1
+                    rounded-full
+                    bg-blue-50
+                    text-accent
+                    text-xs
+                    font-medium
+                  "
+                >
+                  {job.category === "fullstack"
+                    ? "Full Stack"
+                    : job.category === "aiml"
+                      ? "AI/ML"
+                      : job.category === "datascience"
+                        ? "Data Science"
+                        : job.category}
+                </div>
+              )}
+
+              {job.status === "closed" && (
+                <div
+                  className="
+                    px-3
+                    py-1
+                    rounded-full
+                    bg-red-50
+                    text-red-600
+                    text-xs
+                    font-medium
+                  "
+                >
+                  Closed
+                </div>
+              )}
+            </div>
 
             {/* TITLE */}
             <h2
@@ -111,102 +193,115 @@ function JobCard({
                 font-semibold
                 leading-tight
                 text-primary
-                transition-colors
-                group-hover:text-accent
               "
             >
               {job.title}
             </h2>
 
             {/* AI SCORE */}
-            <div className="mt-4">
-              {score ? (
-                <div
-                  className="
-                    inline-flex
-                    items-center
-                    gap-2
-                    px-4
-                    py-2
-                    rounded-full
-                    bg-blue-50
-                    text-accent
-                    text-sm
-                    font-semibold
-                  "
-                >
-                  <Sparkles size={16} />
-
-                  <span>{score}% Score</span>
-                </div>
-              ) : (
-                <button
-                  onClick={handleScore}
-                  disabled={loading}
-                  className="
-                    inline-flex
-                    items-center
-                    gap-2
-                    px-4
-                    py-2
-                    rounded-full
-                    bg-stone
-                    text-primary
-                    text-sm
-                    font-medium
-                    transition-all
-                    hover:bg-blue-50
-                    hover:text-accent
-                  "
-                >
-                  {loading ? (
-                    <Loader2
-                      size={16}
-                      className="
-                        animate-spin
-                      "
-                    />
-                  ) : (
+            {!recruiterMode && (
+              <div className="mt-4">
+                {score ? (
+                  <div
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      px-4
+                      py-2
+                      rounded-full
+                      bg-blue-50
+                      text-accent
+                      text-sm
+                      font-semibold
+                    "
+                  >
                     <Sparkles size={16} />
-                  )}
 
-                  <span>{loading ? "Loading..." : "Get Score"}</span>
-                </button>
-              )}
-            </div>
+                    <span>{score}% Score</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleScore}
+                    disabled={loading || !user?.resumeUrl}
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      px-4
+                      py-2
+                      rounded-full
+                      bg-stone
+                      text-primary
+                      text-sm
+                      font-medium
+                      transition-colors
+                      hover:bg-border
+                      disabled:opacity-50
+                      disabled:cursor-not-allowed
+                    "
+                  >
+                    {loading ? <Spinner size="sm" /> : <Sparkles size={16} />}
+
+                    <span>
+                      {!user?.resumeUrl
+                        ? "Resume Required"
+                        : loading
+                          ? "Loading..."
+                          : "Get Score"}
+                    </span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* SAVE BUTTON */}
-          <button
-            onClick={handleSave}
-            className="
-              w-11
-              h-11
-              rounded-2xl
-              border
-              border-border
-              flex
-              items-center
-              justify-center
-              transition-all
-              hover:bg-stone
-            "
-          >
-            <Bookmark
-              size={18}
-              className={
-                isSaved
-                  ? `
-                    fill-primary
-                    text-primary
-                  `
-                  : `
-                    text-muted
-                    hover:text-primary
-                  `
-              }
-            />
-          </button>
+          {/* RIGHT ACTION */}
+          {!recruiterMode ? (
+            <button
+              onClick={handleSave}
+              className="
+                w-11
+                h-11
+                rounded-2xl
+                border
+                border-border
+                flex
+                items-center
+                justify-center
+                transition-colors
+                hover:bg-stone
+              "
+            >
+              <Bookmark
+                size={18}
+                className={
+                  isSaved
+                    ? `
+                      fill-primary
+                      text-primary
+                    `
+                    : `
+                      text-muted
+                    `
+                }
+              />
+            </button>
+          ) : (
+            <div
+              className="
+                px-4
+                py-2
+                rounded-full
+                bg-stone
+                text-sm
+                text-primary
+                font-medium
+              "
+            >
+              {job.applicationsCount || 0} Applicants
+            </div>
+          )}
         </div>
 
         {/* DESCRIPTION */}
@@ -222,79 +317,49 @@ function JobCard({
         </p>
 
         {/* SKILLS */}
-        <div
-          className="
-            mt-6
-            flex
-            flex-wrap
-            gap-3
-          "
-        >
-          {job.requiredSkills?.slice(0, 4).map((skill) => (
-            <Badge key={skill}>{skill}</Badge>
-          ))}
+        <div className="mt-6">
+          <JobTagList skills={job.requiredSkills} limit={4} />
         </div>
 
+        {/* PERKS */}
+        {job.perks?.length > 0 && (
+          <div
+            className="
+              mt-5
+              flex
+              flex-wrap
+              gap-2
+            "
+          >
+            {job.perks.slice(0, 3).map((perk) => (
+              <div
+                key={perk}
+                className="
+                    px-3
+                    py-1.5
+                    rounded-full
+                    bg-stone
+                    text-xs
+                    text-primary
+                  "
+              >
+                {perk}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* META */}
-        <div
-          className="
-            mt-8
-            flex
-            flex-wrap
-            items-center
-            gap-5
-            text-sm
-            text-muted
-          "
-        >
-          {/* LOCATION */}
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <MapPin size={16} />
-
-            <span>{job.location || "Remote"}</span>
-          </div>
-
-          {/* TYPE */}
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <BriefcaseBusiness size={16} />
-
-            <span
-              className="
-                capitalize
-              "
-            >
-              {job.type}
-            </span>
-          </div>
-
-          {/* DEADLINE */}
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <Clock3 size={16} />
-
-            <span>
-              {job.deadline
-                ? `Apply before ${new Date(job.deadline).toLocaleDateString()}`
-                : "Applications open"}
-            </span>
-          </div>
+        <div className="mt-8">
+          <JobMeta
+            location={job.location}
+            mode={job.mode}
+            stipend={job.stipend}
+            duration={job.duration}
+            openingsCount={job.openingsCount}
+            startDate={job.startDate}
+            deadline={job.deadline}
+          />
         </div>
 
         {/* FOOTER */}
@@ -308,6 +373,7 @@ function JobCard({
             items-center
             justify-between
             gap-4
+            flex-wrap
           "
         >
           {/* STIPEND */}
@@ -334,27 +400,103 @@ function JobCard({
             >
               <IndianRupee size={18} />
 
-              <span>{job.stipend || "Unpaid"}</span>
+              <span>{job.stipend ? `₹${job.stipend}` : "Unpaid"}</span>
             </div>
           </div>
 
-          {/* CTA */}
-          <div
-            className="
-              px-5
-              py-3
-              rounded-2xl
-              bg-primary
-              text-white
-              text-sm
-              font-medium
-              transition-all
-              duration-200
-              group-hover:bg-black
-            "
-          >
-            View Details
-          </div>
+          {/* ACTIONS */}
+          {!recruiterMode ? (
+            <div
+              className="
+                px-5
+                py-3
+                rounded-2xl
+                bg-primary
+                text-white
+                text-sm
+                font-medium
+              "
+            >
+              View Details
+            </div>
+          ) : (
+            <div
+              className="
+                flex
+                items-center
+                gap-3
+                flex-wrap
+              "
+            >
+              {/* APPLICANTS */}
+              <Button
+                onClick={handleApplicants}
+                variant="secondary"
+                className="
+                  rounded-2xl
+                "
+              >
+                <Users size={16} />
+                Applicants
+              </Button>
+
+              {/* EDIT */}
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  e.stopPropagation();
+
+                  navigate(`/recruiter/jobs/${job._id}/edit`);
+                }}
+                variant="secondary"
+                className="
+                  rounded-2xl
+                "
+              >
+                <Pencil size={16} />
+                Edit
+              </Button>
+
+              {/* CLOSE */}
+              {job.status === "active" && (
+                <Button
+                  onClick={handleClose}
+                  variant="secondary"
+                  className="
+                    rounded-2xl
+                  "
+                >
+                  <Lock size={16} />
+                  Close
+                </Button>
+              )}
+
+              {job.status === "closed" && (
+                <Button
+                  onClick={handleReopen}
+                  variant="secondary"
+                  className="
+                    rounded-2xl
+                  "
+                >
+                  <Sparkles size={16} />
+                  Reopen
+                </Button>
+              )}
+
+              {/* DELETE */}
+              <Button
+                onClick={handleDelete}
+                className="
+                  rounded-2xl
+                "
+              >
+                <Trash2 size={16} />
+                Delete
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Link>

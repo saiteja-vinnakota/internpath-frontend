@@ -5,64 +5,123 @@ import {
   FileText,
   User,
   LogOut,
+  PlusSquare,
+  Bell,
 } from "lucide-react";
 
-import { Link, useLocation } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+} from "react-router-dom";
 
 import Avatar from "../ui/Avatar";
 
-import { useAuth } from "../../context/AuthContext";
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
+import {
+  useNotificationContext,
+} from "../../context/NotificationContext";
 
 function Sidebar() {
-  const location = useLocation();
+
+  const location =
+    useLocation();
 
   const {
     user,
-
     logout,
   } = useAuth();
 
-  const navItems = [
+  const {
+    unreadCount,
+  } =
+    useNotificationContext();
+
+  // STUDENT NAVIGATION
+  const studentNavItems = [
+
     {
       label: "Dashboard",
-
       icon: LayoutDashboard,
-
       path: "/student/dashboard",
     },
 
     {
       label: "Internships",
-
       icon: BriefcaseBusiness,
-
       path: "/jobs",
     },
 
     {
       label: "Saved Jobs",
-
       icon: Bookmark,
-
       path: "/student/saved",
     },
 
     {
       label: "Applications",
-
       icon: FileText,
-
       path: "/student/applications",
     },
 
     {
+      label: "Notifications",
+      icon: Bell,
+      path: "/notifications",
+    },
+
+    {
       label: "Profile",
-
       icon: User,
-
       path: "/student/profile",
     },
   ];
+
+  // RECRUITER NAVIGATION
+  const recruiterNavItems = [
+
+    {
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/recruiter/dashboard",
+    },
+
+    {
+      label: "Manage Listings",
+      icon: BriefcaseBusiness,
+      path: "/recruiter/manage-listings",
+    },
+
+    {
+      label: "Post Internship",
+      icon: PlusSquare,
+      path: "/recruiter/post-job",
+    },
+
+    {
+      label: "Notifications",
+      icon: Bell,
+      path: "/notifications",
+    },
+
+    {
+      label: "Profile",
+      icon: User,
+      path: "/recruiter/profile",
+    },
+  ];
+
+  // ROLE BASED NAVIGATION
+  const navItems =
+
+    user?.role ===
+    "recruiter"
+
+      ? recruiterNavItems
+
+      : studentNavItems;
 
   return (
     <aside
@@ -77,6 +136,7 @@ function Sidebar() {
         flex-col
       "
     >
+
       {/* LOGO */}
       <Link
         to="/"
@@ -86,6 +146,7 @@ function Sidebar() {
           gap-3
         "
       >
+
         <div
           className="
             w-10
@@ -97,18 +158,29 @@ function Sidebar() {
             justify-center
           "
         >
+
           <svg
             viewBox="0 0 18 18"
-            className="w-5 h-5"
+            className="
+              w-5
+              h-5
+            "
             fill="none"
             stroke="white"
             strokeWidth="2"
             strokeLinecap="round"
           >
+
             <path d="M3 14l3-4 3 2 3-5 3 4" />
 
-            <circle cx="9" cy="4" r="1.5" />
+            <circle
+              cx="9"
+              cy="4"
+              r="1.5"
+            />
+
           </svg>
+
         </div>
 
         <h1
@@ -120,6 +192,7 @@ function Sidebar() {
         >
           InternPath
         </h1>
+
       </Link>
 
       {/* NAVIGATION */}
@@ -129,57 +202,133 @@ function Sidebar() {
           space-y-2
         "
       >
-        {navItems.map((item) => {
-          const Icon = item.icon;
 
-          const isActive = location.pathname === item.path;
+        {navItems.map(
+          (item) => {
 
-          return (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`
-                flex
-                items-center
-                gap-4
-                px-4
-                py-3
-                rounded-2xl
-                transition-all
-                duration-200
+            const Icon =
+              item.icon;
 
-                ${
-                  isActive
-                    ? `
-                      bg-primary
-                      text-white
-                      shadow-sm
-                    `
-                    : `
-                      text-muted
-                      hover:bg-stone
-                      hover:text-primary
-                    `
-                }
-              `}
-            >
-              <Icon size={20} />
+            const isActive =
 
-              <span
-                className="
-                  text-sm
-                  font-medium
-                "
+              location.pathname ===
+              item.path;
+
+            return (
+
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`
+                  flex
+                  items-center
+                  gap-4
+                  px-4
+                  py-3
+                  rounded-2xl
+                  transition-all
+                  duration-200
+
+                  ${
+
+                    isActive
+
+                      ? `
+                        bg-primary
+                        text-white
+                        shadow-sm
+                      `
+
+                      : `
+                        text-muted
+                        hover:bg-stone
+                        hover:text-primary
+                      `
+                  }
+                `}
               >
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+
+                <Icon size={20} />
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    w-full
+                  "
+                >
+
+                  <span
+                    className="
+                      text-sm
+                      font-medium
+                    "
+                  >
+                    {item.label}
+                  </span>
+
+                  {item.label ===
+                    "Notifications" &&
+
+                    unreadCount > 0 && (
+
+                    <span
+                      className={`
+                        min-w-[22px]
+                        h-[22px]
+
+                        px-2
+
+                        rounded-full
+
+                        text-[11px]
+                        font-semibold
+
+                        flex
+                        items-center
+                        justify-center
+
+                        ${
+
+                          isActive
+
+                            ? `
+                              bg-white
+                              text-primary
+                            `
+
+                            : `
+                              bg-accent
+                              text-white
+                            `
+                        }
+                      `}
+                    >
+
+                      {unreadCount > 99
+
+                        ? "99+"
+
+                        : unreadCount}
+
+                    </span>
+
+                  )}
+
+                </div>
+
+              </Link>
+
+            );
+          }
+        )}
+
       </nav>
 
       {/* PROFILE */}
       <div className="mt-auto">
+
         <div
           className="
             p-4
@@ -187,22 +336,38 @@ function Sidebar() {
             bg-stone
           "
         >
+
           {/* USER */}
           <Link
-            to="/student/profile"
+            to={
+
+              user?.role ===
+              "recruiter"
+
+                ? "/recruiter/profile"
+
+                : "/student/profile"
+            }
             className="
               flex
               items-center
               gap-4
             "
           >
-            <Avatar src={user?.profilePicture} alt={user?.name} />
+
+            <Avatar
+              src={
+                user?.profilePicture
+              }
+              alt={user?.name}
+            />
 
             <div
               className="
                 min-w-0
               "
             >
+
               <h3
                 className="
                   text-sm
@@ -211,7 +376,8 @@ function Sidebar() {
                   truncate
                 "
               >
-                {user?.name || "Student"}
+                {user?.name ||
+                  "User"}
               </h3>
 
               <p
@@ -224,7 +390,9 @@ function Sidebar() {
               >
                 {user?.email}
               </p>
+
             </div>
+
           </Link>
 
           {/* LOGOUT */}
@@ -246,12 +414,19 @@ function Sidebar() {
               transition-all
             "
           >
+
             <LogOut size={18} />
 
-            <span>Logout</span>
+            <span>
+              Logout
+            </span>
+
           </button>
+
         </div>
+
       </div>
+
     </aside>
   );
 }

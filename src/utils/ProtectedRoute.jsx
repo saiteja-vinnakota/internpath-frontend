@@ -10,7 +10,11 @@ import Spinner
 from "../components/ui/Spinner";
 
 function ProtectedRoute({
+
   children,
+
+  role,
+
 }) {
 
   const {
@@ -41,7 +45,7 @@ function ProtectedRoute({
     );
   }
 
-  // NOT AUTHORIZED
+  // NOT LOGGED IN
   if (!user) {
 
     return (
@@ -52,7 +56,30 @@ function ProtectedRoute({
     );
   }
 
-  // AUTHORIZED
+  // ROLE CHECK
+  if (
+
+    role &&
+
+    user.role !== role
+
+  ) {
+
+    return (
+      <Navigate
+        to={
+          user.role ===
+          "recruiter"
+
+            ? "/recruiter/dashboard"
+
+            : "/student/dashboard"
+        }
+        replace
+      />
+    );
+  }
+
   return children;
 }
 

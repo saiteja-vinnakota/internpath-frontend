@@ -4,15 +4,17 @@ import DashboardLayout from "../../components/layout/DashboardLayout";
 
 import PageHeader from "../../components/layout/PageHeader";
 
-import JobCard from "../../components/cards/JobCard";
+import JobList from "../../components/job/JobList";
 
 import JobSearchBar from "../../components/filters/JobSearchBar";
 
 import JobFilterSidebar from "../../components/filters/JobFilterSidebar";
 
-import Skeleton from "../../components/ui/Skeleton";
+import ActiveFilterChips from "../../components/filters/ActiveFilterChips";
 
 import EmptyState from "../../components/ui/EmptyState";
+
+import Pagination from "../../components/ui/Pagination";
 
 import useJobs from "../../hooks/useJobs";
 
@@ -26,16 +28,18 @@ function JobListingsPage() {
 
   // FILTERS
   const [filters, setFilters] = useState({
-    type: "",
-
+    page: 1,
+    mode: "",
+    category: "",
+    duration: "",
+    stipend: "",
     location: "",
-
+    batch: "",
     sort: "createdAt",
   });
 
   // DEBOUNCED SEARCH
-  const debouncedSearch =
-    useDebounce(search);
+  const debouncedSearch = useDebounce(search);
 
   // JOBS
   const {
@@ -44,6 +48,8 @@ function JobListingsPage() {
     loading,
 
     error,
+
+    pagination,
 
     fetchJobs,
   } = useJobs();
@@ -62,21 +68,15 @@ function JobListingsPage() {
   // FETCH SAVED JOBS
   useEffect(() => {
     fetchSavedJobs();
-  }, []);
+  }, [fetchSavedJobs]);
 
   // FETCH JOBS
   useEffect(() => {
     fetchJobs({
-      keyword:
-        debouncedSearch,
-
+      keyword: debouncedSearch,
       ...filters,
     });
-  }, [
-    debouncedSearch,
-
-    filters,
-  ]);
+  }, [debouncedSearch, filters, fetchJobs]);
 
   return (
     <DashboardLayout>
@@ -89,163 +89,57 @@ function JobListingsPage() {
         "
       />
 
-      {/* SEARCH */}
-      <div className="mt-8">
-        <JobSearchBar
-          value={search}
-          onChange={setSearch}
-        />
-      </div>
+      {/* SEARCH & FILTERS CONTAINER */}
+      <div className="mt-8 space-y-4">
+        {/* SEARCH */}
+        <JobSearchBar value={search} onChange={setSearch} />
 
-      {/* FILTERS */}
-      <div className="mt-6">
+        {/* FILTERS */}
         <JobFilterSidebar
           filters={filters}
           setFilters={setFilters}
+          onClearSearch={() => setSearch("")}
         />
+
+        {/* ACTIVE FILTERS */}
+        <ActiveFilterChips filters={filters} setFilters={setFilters} />
       </div>
 
-      {/* JOBS */}
-      <div className="mt-10">
-        {loading ? (
-          <div
-            className="
-              grid
-              grid-cols-1
-              2xl:grid-cols-2
-              gap-6
-            "
-          >
-            {[...Array(6)].map(
-              (_, index) => (
-                <div
-                  key={index}
-                  className="
-                    p-7
-                    rounded-[32px]
-                    bg-white
-                    border
-                    border-border
-                    space-y-5
-                  "
-                >
-                  {/* COMPANY */}
-                  <Skeleton
-                    className="
-                      h-4
-                      w-24
-                    "
-                  />
+      {/* ERROR */}
+      {error && (
+        <div className="mt-10">
+          <EmptyState title="Something went wrong" description={error} />
+        </div>
+      )}
 
-                  {/* TITLE */}
-                  <Skeleton
-                    className="
-                      h-8
-                      w-3/4
-                    "
-                  />
-
-                  {/* DESCRIPTION */}
-                  <Skeleton
-                    className="
-                      h-20
-                      w-full
-                    "
-                  />
-
-                  {/* SKILLS */}
-                  <div className="flex gap-3">
-                    <Skeleton
-                      className="
-                        h-8
-                        w-20
-                      "
-                    />
-
-                    <Skeleton
-                      className="
-                        h-8
-                        w-20
-                      "
-                    />
-
-                    <Skeleton
-                      className="
-                        h-8
-                        w-20
-                      "
-                    />
-                  </div>
-
-                  {/* FOOTER */}
-                  <div
-                    className="
-                      flex
-                      items-center
-                      justify-between
-                      pt-4
-                    "
-                  >
-                    <Skeleton
-                      className="
-                        h-10
-                        w-32
-                      "
-                    />
-
-                    <Skeleton
-                      className="
-                        h-10
-                        w-28
-                      "
-                    />
-                  </div>
-                </div>
-              )
-            )}
-          </div>
-        ) : error ? (
-          <EmptyState
-            title="Something went wrong"
-            description={error}
+      {/* JOBS GRID */}
+      {!error && (
+        <div className="mt-10">
+          <JobList
+            jobs={jobs}
+            loading={loading}
+            savedJobs={savedJobs}
+            onSave={handleSaveJob}
+            onRemove={handleRemoveSavedJob}
+            emptyTitle="No jobs found"
+            emptyDescription="Try changing filters or search keywords."
           />
-        ) : jobs.length === 0 ? (
-          <EmptyState
-            title="No jobs found"
-            description="
-              Try changing filters
-              or search keywords.
-            "
-          />
-        ) : (
-          <div
-            className="
-              grid
-              grid-cols-1
-              2xl:grid-cols-2
-              gap-6
-            "
-          >
-            {jobs.map((job) => (
-              <JobCard
-                key={job._id}
-                job={job}
-                isSaved={savedJobs.some(
-                  (item) =>
-                    item.job?._id ===
-                    job._id
-                )}
-                onSave={
-                  handleSaveJob
-                }
-                onRemove={
-                  handleRemoveSavedJob
-                }
-              />
-            ))}
+
+          {/* PAGINATION */}
+          <div className="mt-8">
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              onPageChange={(page) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  page,
+                }))
+              }
+            />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

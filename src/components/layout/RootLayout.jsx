@@ -1,10 +1,11 @@
+import { Outlet } from "react-router-dom";
+
 import Topbar from "./Topbar";
 
-function RootLayout({
-  children,
-}) {
+function RootLayout() {
 
   return (
+
     <div
       className="
         min-h-screen
@@ -12,19 +13,16 @@ function RootLayout({
       "
     >
 
-      {/* NAVBAR */}
       <Topbar />
 
-      {/* PAGE CONTENT */}
-      <main
-        className="
-          relative
-        "
-      >
-        {children}
+      <main>
+
+        <Outlet />
+
       </main>
 
     </div>
+
   );
 }
 

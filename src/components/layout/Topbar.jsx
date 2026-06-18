@@ -14,10 +14,25 @@ import {
 import Button
 from "../ui/Button";
 
+import {useAuth}
+from "../../context/AuthContext";
+
 function Topbar() {
 
   const [mobileMenu, setMobileMenu] =
     useState(false);
+
+  const {
+    user,
+  } = useAuth();
+
+  const isStudent =
+    user?.role ===
+    "student";
+
+  const isRecruiter =
+    user?.role ===
+    "recruiter";
 
   return (
     <header
@@ -26,9 +41,12 @@ function Topbar() {
         top-0
         left-0
         right-0
+
         z-50
+
         bg-white/80
         backdrop-blur-md
+
         border-b
         border-border
       "
@@ -38,9 +56,12 @@ function Topbar() {
         className="
           max-w-7xl
           mx-auto
+
           px-6
           lg:px-10
+
           h-16
+
           flex
           items-center
           justify-between
@@ -61,8 +82,11 @@ function Topbar() {
             className="
               w-9
               h-9
+
               rounded-xl
+
               bg-primary
+
               flex
               items-center
               justify-center
@@ -77,6 +101,7 @@ function Topbar() {
               strokeWidth="2"
               strokeLinecap="round"
             >
+
               <path d="M3 14l3-4 3 2 3-5 3 4" />
 
               <circle
@@ -84,6 +109,7 @@ function Topbar() {
                 cy="4"
                 r="1.5"
               />
+
             </svg>
 
           </div>
@@ -100,91 +126,182 @@ function Topbar() {
 
         </Link>
 
-        {/* DESKTOP LINKS */}
+        {/* CENTER NAV */}
         <nav
           className="
             hidden
             md:flex
+
             items-center
             gap-8
+
             text-sm
-            text-muted
             font-medium
+
+            text-muted
           "
         >
 
           <a
-            href="#features"
+            href="#home"
             className="
               hover:text-primary
               transition-colors
             "
           >
-            Features
+            Home
           </a>
 
           <a
-            href="#workflow"
+            href="#students"
             className="
               hover:text-primary
               transition-colors
             "
           >
-            Workflow
+            Students
           </a>
 
-          <Link
-            to="/jobs"
+          <a
+            href="#recruiters"
             className="
               hover:text-primary
               transition-colors
             "
           >
-            Internships
-          </Link>
+            Recruiters
+          </a>
+
+          <a
+            href="#ai-matching"
+            className="
+              hover:text-primary
+              transition-colors
+            "
+          >
+            AI Matching
+          </a>
 
         </nav>
 
-        {/* DESKTOP BUTTONS */}
+        {/* RIGHT ACTIONS */}
         <div
           className="
             hidden
             md:flex
+
             items-center
             gap-3
           "
         >
 
-          <Link to="/login">
+          {!user && (
 
-            <Button variant="ghost">
-              Sign In
-            </Button>
+            <>
+              <Link
+                to="/login"
+              >
 
-          </Link>
+                <Button
+                  variant="ghost"
+                >
+                  Sign In
+                </Button>
 
-          <Link to="/register">
+              </Link>
 
-            <Button>
-              Get Started
-            </Button>
+              <Link
+                to="/register"
+              >
 
-          </Link>
+                <Button>
+                  Get Started
+                </Button>
+
+              </Link>
+            </>
+
+          )}
+
+          {isStudent && (
+
+            <>
+              <Link
+                to="/jobs"
+              >
+
+                <Button
+                  variant="secondary"
+                >
+                  Explore Jobs
+                </Button>
+
+              </Link>
+
+              <Link
+                to="/student/dashboard"
+              >
+
+                <Button>
+                  Dashboard
+                </Button>
+
+              </Link>
+            </>
+
+          )}
+
+          {isRecruiter && (
+
+            <>
+              <Link
+                to="/recruiter/post-job"
+              >
+
+                <Button
+                  variant="secondary"
+                >
+                  Post Job
+                </Button>
+
+              </Link>
+
+              <Link
+                to="/recruiter/dashboard"
+              >
+
+                <Button>
+                  Dashboard
+                </Button>
+
+              </Link>
+            </>
+
+          )}
 
         </div>
 
-        {/* MOBILE BUTTON */}
+        {/* MOBILE MENU BUTTON */}
         <button
-          className="md:hidden"
+          className="
+            md:hidden
+          "
           onClick={() =>
-            setMobileMenu(!mobileMenu)
+
+            setMobileMenu(
+              !mobileMenu
+            )
           }
         >
 
           {mobileMenu ? (
+
             <X size={26} />
+
           ) : (
+
             <Menu size={26} />
+
           )}
 
         </button>
@@ -193,82 +310,187 @@ function Topbar() {
 
       {/* MOBILE MENU */}
       {mobileMenu && (
+
         <div
           className="
             md:hidden
+
             bg-white
+
             border-t
             border-border
+
             px-6
             py-6
+
             space-y-5
           "
         >
 
           <a
-            href="#features"
+            href="#home"
             className="
               block
               text-muted
               font-medium
             "
           >
-            Features
+            Home
           </a>
 
           <a
-            href="#workflow"
+            href="#students"
             className="
               block
               text-muted
               font-medium
             "
           >
-            Workflow
+            Students
           </a>
 
-          <Link
-            to="/jobs"
+          <a
+            href="#recruiters"
             className="
               block
               text-muted
               font-medium
             "
           >
-            Internships
-          </Link>
+            Recruiters
+          </a>
+
+          <a
+            href="#ai-matching"
+            className="
+              block
+              text-muted
+              font-medium
+            "
+          >
+            AI Matching
+          </a>
 
           <div
             className="
               pt-3
+
               flex
               flex-col
+
               gap-3
             "
           >
 
-            <Link to="/login">
+            {!user && (
 
-              <Button
-                variant="secondary"
-                className="w-full"
-              >
-                Sign In
-              </Button>
+              <>
+                <Link
+                  to="/login"
+                >
 
-            </Link>
+                  <Button
+                    variant="secondary"
+                    className="
+                      w-full
+                    "
+                  >
+                    Sign In
+                  </Button>
 
-            <Link to="/register">
+                </Link>
 
-              <Button className="w-full">
-                Get Started
-              </Button>
+                <Link
+                  to="/register"
+                >
 
-            </Link>
+                  <Button
+                    className="
+                      w-full
+                    "
+                  >
+                    Get Started
+                  </Button>
+
+                </Link>
+              </>
+
+            )}
+
+            {isStudent && (
+
+              <>
+                <Link
+                  to="/jobs"
+                >
+
+                  <Button
+                    variant="secondary"
+                    className="
+                      w-full
+                    "
+                  >
+                    Explore Jobs
+                  </Button>
+
+                </Link>
+
+                <Link
+                  to="/student/dashboard"
+                >
+
+                  <Button
+                    className="
+                      w-full
+                    "
+                  >
+                    Dashboard
+                  </Button>
+
+                </Link>
+              </>
+
+            )}
+
+            {isRecruiter && (
+
+              <>
+                <Link
+                  to="/recruiter/post-job"
+                >
+
+                  <Button
+                    variant="secondary"
+                    className="
+                      w-full
+                    "
+                  >
+                    Post Job
+                  </Button>
+
+                </Link>
+
+                <Link
+                  to="/recruiter/dashboard"
+                >
+
+                  <Button
+                    className="
+                      w-full
+                    "
+                  >
+                    Dashboard
+                  </Button>
+
+                </Link>
+              </>
+
+            )}
 
           </div>
 
         </div>
+
       )}
 
     </header>

@@ -1,32 +1,36 @@
-import RootLayout
-from "../../components/layout/RootLayout";
-
-import Hero
-from "../../components/landing/Hero";
-
-import Features
-from "../../components/landing/Features";
-
-import HowItWorks
-from "../../components/landing/HowItWorks";
-
-import CTA
-from "../../components/landing/CTA";
+import HeroSection from "../../components/landing/HeroSection";
+import StatsSection from "../../components/landing/StatsSection";
+import StudentSection from "../../components/landing/StudentSection";
+import RecruiterSection from "../../components/landing/RecruiterSection";
+import AIMatchingSection from "../../components/landing/AIMatchingSection";
+import FeaturesSection from "../../components/landing/FeaturesSection";
+import CTASection from "../../components/landing/CTASection";
+import Footer from "../../components/landing/Footer";
 
 function LandingPage() {
-
   return (
-    <RootLayout>
+    <main
+      className="
+        min-h-screen
+        bg-stone
+      "
+    >
+      <HeroSection />
 
-      <Hero />
+      <StatsSection />
 
-      <Features />
+      <StudentSection />
 
-      <HowItWorks />
+      <RecruiterSection />
 
-      <CTA />
+      <AIMatchingSection />
 
-    </RootLayout>
+      <FeaturesSection />
+
+      <CTASection />
+
+      <Footer />
+    </main>
   );
 }
 

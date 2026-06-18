@@ -1,132 +1,85 @@
-import {
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 
-import toast
-from "react-hot-toast";
+import toast from "react-hot-toast";
 
-import {
+import { useAuth } from "../context/AuthContext";
 
-  getSavedJobs,
-
-  saveJob,
-
-  removeSavedJob,
-
-} from "../api/savedJobApi";
+import { getSavedJobs, saveJob, removeSavedJob } from "../api/savedJobApi";
 
 function useSavedJobs() {
+  const { user } = useAuth();
 
-  const [
+  const [savedJobs, setSavedJobs] = useState([]);
 
-    savedJobs,
-
-    setSavedJobs,
-
-  ] = useState([]);
-
-  const [
-
-    loading,
-
-    setLoading,
-
-  ] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // FETCH SAVED JOBS
-  const fetchSavedJobs =
-    async () => {
+  const fetchSavedJobs = useCallback(async () => {
+    // SAVED JOBS ARE
+    // STUDENT ONLY
+    if (user?.role !== "student") {
+      return;
+    }
 
-      try {
+    try {
+      setLoading(true);
 
-        setLoading(true);
+      const response = await getSavedJobs();
 
-        const response =
-          await getSavedJobs();
+      setSavedJobs(response.data || []);
+    } catch (error) {
+      console.log(error);
 
-        setSavedJobs(
-          response.data || []
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-        toast.error(
-          "Failed to load saved jobs"
-        );
-
-      } finally {
-
-        setLoading(false);
+      // AVOID NOISY TOASTS
+      // FOR AUTH / ROLE ISSUES
+      if (error.response?.status !== 401 && error.response?.status !== 403) {
+        toast.error("Failed to load saved jobs");
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.role]);
 
   // SAVE JOB
-  const handleSaveJob =
-    async (jobId) => {
+  const handleSaveJob = async (jobId) => {
+    if (user?.role !== "student") {
+      return;
+    }
 
-      try {
+    try {
+      await saveJob(jobId);
 
-        await saveJob(jobId);
+      toast.success("Job saved successfully");
 
-        toast.success(
-          "Job saved successfully"
-        );
-
-        await fetchSavedJobs();
-
-      } catch (error) {
-
-        toast.error(
-          error.response?.data?.message ||
-          "Failed to save job"
-        );
-      }
-    };
+      await fetchSavedJobs();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to save job");
+    }
+  };
 
   // REMOVE SAVED JOB
-  const handleRemoveSavedJob =
-    async (jobId) => {
+  const handleRemoveSavedJob = async (jobId) => {
+    if (user?.role !== "student") {
+      return;
+    }
 
-      try {
+    try {
+      await removeSavedJob(jobId);
 
-        await removeSavedJob(jobId);
+      toast.success("Removed from saved jobs");
 
-        toast.success(
-          "Removed from saved jobs"
-        );
-
-        setSavedJobs((prev) =>
-          prev.filter(
-            (item) =>
-              item.job._id !==
-              jobId
-          )
-        );
-
-      } catch (error) {
-
-        toast.error(
-          error.response?.data?.message ||
-          "Failed to remove job"
-        );
-      }
-    };
+      setSavedJobs((prev) => prev.filter((item) => item.job._id !== jobId));
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to remove job");
+    }
+  };
 
   // CHECK SAVED
-  const isJobSaved =
-    (jobId) => {
-
-      return savedJobs.some(
-        (item) =>
-          item.job._id ===
-          jobId
-      );
-    };
+  const isJobSaved = (jobId) => {
+    return savedJobs.some((item) => item.job._id === jobId);
+  };
 
   return {
-
     savedJobs,
 
     loading,

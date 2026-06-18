@@ -1,64 +1,111 @@
 function Select({
+
   label,
+
   options = [],
+
+  error,
+
   className = "",
+
   ...props
+
 }) {
 
   return (
+
     <div>
 
-      {/* LABEL */}
       {label && (
+
         <label
           className="
             block
-            mb-2
+            mb-3
             text-sm
             font-medium
             text-primary
           "
         >
+
           {label}
+
         </label>
+
       )}
 
-      {/* SELECT */}
       <select
         className={`
           w-full
-          h-12
-          px-4
-          bg-stone
-          border
-          border-border
+
+          h-14
+
+          px-5
+
           rounded-2xl
+
+          border
+
+          ${
+            error
+              ? "border-red-300"
+              : "border-border"
+          }
+
+          bg-white
+
           outline-none
-          text-sm
+
           transition-all
+
           focus:border-accent
           focus:ring-4
-          focus:ring-blue-100
+          focus:ring-blue-50
 
           ${className}
         `}
         {...props}
       >
 
-        {options.map((option) => (
+        {options.map(
+          (option) => (
 
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
+            <option
+              key={
+                option.value
+              }
+              value={
+                option.value
+              }
+            >
 
-        ))}
+              {option.label}
+
+            </option>
+
+          )
+        )}
 
       </select>
 
+      {error && (
+
+        <p
+          className="
+            mt-2
+            text-sm
+            text-red-500
+          "
+        >
+
+          {error}
+
+        </p>
+
+      )}
+
     </div>
+
   );
 }
 

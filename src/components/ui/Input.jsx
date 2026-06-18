@@ -11,6 +11,12 @@ function Input({
 
   label,
 
+  error,
+
+  leftIcon,
+
+  rightElement,
+
   type = "text",
 
   className = "",
@@ -19,8 +25,10 @@ function Input({
 
 }) {
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
 
   const isPassword =
     type === "password";
@@ -35,10 +43,11 @@ function Input({
       : type;
 
   return (
-    <div>
 
-      {/* LABEL */}
+    <div className="w-full">
+
       {label && (
+
         <label
           className="
             block
@@ -48,43 +57,79 @@ function Input({
             text-primary
           "
         >
+
           {label}
+
         </label>
+
       )}
 
-      {/* INPUT WRAPPER */}
       <div className="relative">
 
-        {/* INPUT */}
+        {leftIcon && (
+
+          <div
+            className="
+              absolute
+              left-4
+              top-1/2
+              -translate-y-1/2
+              text-muted
+            "
+          >
+
+            {leftIcon}
+
+          </div>
+
+        )}
+
         <input
           type={inputType}
           className={`
             w-full
-            h-14
-            px-5
-            rounded-2xl
-            border
-            border-border
-            bg-white
-            text-primary
-            outline-none
-            transition-all
-            duration-200
 
-            placeholder:text-muted
+            h-14
+
+            rounded-2xl
+
+            border
+
+            ${
+              error
+                ? "border-red-300"
+                : "border-border"
+            }
+
+            bg-white
+
+            px-5
+
+            ${
+              leftIcon
+                ? "pl-12"
+                : ""
+            }
+
+            ${
+              isPassword
+                ? "pr-14"
+                : ""
+            }
+
+            outline-none
+
+            transition-all
 
             focus:border-accent
             focus:ring-4
             focus:ring-blue-50
-
-            ${isPassword ? "pr-14" : ""}
 
             ${className}
           `}
           {...props}
         />
 
-        {/* PASSWORD TOGGLE */}
         {isPassword && (
 
           <button
@@ -100,27 +145,42 @@ function Input({
               top-1/2
               -translate-y-1/2
               text-muted
-              hover:text-primary
-              transition-colors
             "
           >
 
-            {showPassword ? (
+            {showPassword
 
-              <EyeOff size={20} />
+              ? <EyeOff size={20} />
 
-            ) : (
-
-              <Eye size={20} />
-
-            )}
+              : <Eye size={20} />
+            }
 
           </button>
+
         )}
+
+        {rightElement}
 
       </div>
 
+      {error && (
+
+        <p
+          className="
+            mt-2
+            text-sm
+            text-red-500
+          "
+        >
+
+          {error}
+
+        </p>
+
+      )}
+
     </div>
+
   );
 }
 

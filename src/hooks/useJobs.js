@@ -1,108 +1,208 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 
 import {
   getJobs,
+  getRecruiterJobs,
+  createJob,
+  updateJob,
+  closeJob,
+  deleteJob,
 } from "../api/jobApi";
 
-function useJobs(
-  initialFilters = {}
-) {
+import { getErrorMessage } from "../utils/errorHandler";
 
-  const [jobs, setJobs] =
-    useState([]);
+function useJobs(initialFilters = {}) {
+  const [jobs, setJobs] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
-  const [filters, setFilters] =
-    useState({
+  const [pagination, setPagination] = useState({
+    totalJobs: 0,
 
-      page: 1,
+    currentPage: 1,
 
-      limit: 6,
+    totalPages: 1,
 
-      keyword: "",
+    limit: 6,
+  });
 
-      type: "",
+  const [filters, setFilters] = useState({
+    page: 1,
 
-      location: "",
+    limit: 6,
 
-      sort: "createdAt",
+    keyword: "",
 
-      ...initialFilters,
-    });
+    mode: "",
 
-  // FETCH JOBS
-  const fetchJobs =
-    async (
-      customFilters = {}
-    ) => {
+    category: "",
 
+    stipend: "",
+
+    location: "",
+
+    sort: "createdAt",
+
+    ...initialFilters,
+  });
+
+  // FETCH PUBLIC JOBS
+  const fetchJobs = useCallback(
+    async (customFilters = {}) => {
       try {
-
         setLoading(true);
-
         setError("");
 
         const finalFilters = {
-
           ...filters,
-
           ...customFilters,
         };
 
-        const data =
-          await getJobs(
-            finalFilters
-          );
+        const data = await getJobs(finalFilters);
 
-        setJobs(
-          data.data.jobs
+        setJobs(data?.data?.jobs || []);
+
+        setPagination(
+          data?.data?.pagination || {
+            totalJobs: 0,
+            currentPage: 1,
+            totalPages: 1,
+            limit: 6,
+          },
         );
-
       } catch (err) {
-
+        const message = getErrorMessage(err);
+        setError(message);
         console.log(err);
-
-        setError(
-
-          err.response?.data
-            ?.message ||
-
-          "Failed to fetch jobs"
-        );
-
       } finally {
-
         setLoading(false);
       }
-    };
+    },
+    [filters],
+  );
 
-  useEffect(() => {
+  // FETCH RECRUITER JOBS
+  const fetchRecruiterJobs = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    fetchJobs();
+      const data = await getRecruiterJobs();
 
+      setJobs(data?.data || []);
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return {
+  // CREATE JOB
+  const handleCreateJob = async (formData) => {
+    try {
+      setLoading(true);
 
+      return await createJob(formData);
+    } catch (err) {
+      console.log(err);
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // UPDATE JOB
+  const handleUpdateJob = async (jobId, formData) => {
+    try {
+      setLoading(true);
+
+      return await updateJob(
+        jobId,
+
+        formData,
+      );
+    } catch (err) {
+      console.log(err);
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // CLOSE JOB
+  const handleCloseJob = async (jobId) => {
+    try {
+      setLoading(true);
+
+      await closeJob(jobId);
+
+      setJobs((prev) =>
+        prev.map((job) =>
+          job._id === jobId
+            ? {
+                ...job,
+
+                status: "closed",
+              }
+            : job,
+        ),
+      );
+    } catch (err) {
+      console.log(err);
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // DELETE JOB
+  const handleDeleteJob = async (jobId) => {
+    try {
+      setLoading(true);
+
+      await deleteJob(jobId);
+
+      setJobs((prev) => prev.filter((job) => job._id !== jobId));
+    } catch (err) {
+      console.log(err);
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
     jobs,
 
     loading,
 
     error,
 
+    pagination,
+
     filters,
 
     setFilters,
 
     fetchJobs,
+
+    fetchRecruiterJobs,
+
+    handleCreateJob,
+
+    handleUpdateJob,
+
+    handleCloseJob,
+
+    handleDeleteJob,
   };
 }
 

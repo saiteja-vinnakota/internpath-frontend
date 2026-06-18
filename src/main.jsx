@@ -1,5 +1,3 @@
-import React from "react";
-
 import ReactDOM from "react-dom/client";
 
 import {
@@ -16,67 +14,71 @@ import {
   AuthProvider,
 } from "./context/AuthContext";
 
+import {
+  NotificationProvider,
+} from "./context/NotificationContext";
+
 import "./index.css";
 
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
 
-  <React.StrictMode>
+  <BrowserRouter>
 
-    <BrowserRouter>
+    <AuthProvider>
 
-      <AuthProvider>
+      <NotificationProvider>
 
         <App />
 
-      </AuthProvider>
+      </NotificationProvider>
 
-      <Toaster
-        position="top-right"
-        toastOptions={{
+    </AuthProvider>
 
-          duration: 3000,
+    <Toaster
+      position="top-right"
+      toastOptions={{
 
-          style: {
+        duration: 3000,
 
-            borderRadius: "18px",
+        style: {
 
-            padding: "14px 18px",
+          borderRadius: "18px",
 
-            background: "#ffffff",
+          padding: "14px 18px",
 
-            color: "#111827",
+          background: "#ffffff",
 
-            border: "1px solid #e5e7eb",
+          color: "#111827",
 
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,0.08)",
+          border: "1px solid #e5e7eb",
+
+          boxShadow:
+            "0 10px 30px rgba(0,0,0,0.08)",
+        },
+
+        success: {
+
+          iconTheme: {
+
+            primary: "#2563eb",
+
+            secondary: "#ffffff",
           },
+        },
 
-          success: {
+        error: {
 
-            iconTheme: {
+          iconTheme: {
 
-              primary: "#2563eb",
+            primary: "#ef4444",
 
-              secondary: "#ffffff",
-            },
+            secondary: "#ffffff",
           },
+        },
+      }}
+    />
 
-          error: {
-
-            iconTheme: {
-
-              primary: "#ef4444",
-
-              secondary: "#ffffff",
-            },
-          },
-        }}
-      />
-
-    </BrowserRouter>
-
-  </React.StrictMode>
+  </BrowserRouter>
 );

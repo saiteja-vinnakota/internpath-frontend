@@ -1,5 +1,9 @@
 function Spinner({
+
   size = "md",
+
+  color = "white",
+
 }) {
 
   const sizes = {
@@ -11,15 +15,27 @@ function Spinner({
     lg: "w-8 h-8 border-[3px]",
   };
 
+  const colors = {
+
+    white:
+      "border-white/30 border-t-white",
+
+    primary:
+      "border-primary/20 border-t-primary",
+
+    accent:
+      "border-accent/20 border-t-accent",
+  };
+
   return (
     <div
       className={`
         rounded-full
-        border-white/30
-        border-t-white
         animate-spin
 
         ${sizes[size]}
+
+        ${colors[color]}
       `}
     />
   );

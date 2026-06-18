@@ -1,20 +1,26 @@
 function Badge({
+
   children,
+
+  className = "",
+
 }) {
 
   return (
     <span
-      className="
+      className={`
         px-3
         py-1.5
         rounded-full
-        bg-blue-50
-        text-accent
         text-xs
         font-medium
-      "
+
+        ${className}
+      `}
     >
+
       {children}
+
     </span>
   );
 }
