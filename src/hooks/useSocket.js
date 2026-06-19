@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import toast from "react-hot-toast";
+import { showToast } from "../utils/toastService";
 
 import { socket } from "../config/socket";
 
@@ -21,7 +21,7 @@ function useSocket() {
     socket.connect();
 
     socket.emit("join", user._id);
-    
+
     socket.on("connect", () => {
       console.log("SOCKET CONNECTED");
     });
@@ -39,7 +39,7 @@ function useSocket() {
       (notification) => {
         setNotifications((prev) => [notification, ...prev]);
 
-        toast.success(notification.message);
+        showToast.success(notification.message);
       },
     );
 

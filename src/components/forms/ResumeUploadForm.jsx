@@ -1,129 +1,79 @@
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
-import {
-  Upload,
-  FileText
-} from "lucide-react";
+import { Upload, FileText } from "lucide-react";
 
-import Spinner
-from "../ui/Spinner";
+import Spinner from "../ui/Spinner";
 
-import toast
-from "react-hot-toast";
+import { showToast } from "../../utils/toastService";
 
-import {
-  uploadResume,
-} from "../../api/resumeApi";
+import { TOAST_MESSAGES } from "../../constants/toastMessages";
 
-import {
-  useAuth,
-} from "../../context/AuthContext";
+import { uploadResume } from "../../api/resumeApi";
+
+import { useAuth } from "../../context/AuthContext";
 
 function ResumeUploadForm({
-
   user,
 
   onUploadSuccess,
-
 }) {
+  const { setUser } = useAuth();
 
-  const { setUser } =
-    useAuth();
+  const [file, setFile] = useState(null);
 
-  const [file, setFile] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   // FILE CHANGE
-  const handleFileChange =
-    (e) => {
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
 
-      const selectedFile =
-        e.target.files[0];
+    if (!selectedFile) {
+      return;
+    }
 
-      if (!selectedFile) {
-        return;
-      }
+    // PDF VALIDATION
+    if (selectedFile.type !== "application/pdf") {
+      showToast.error("Only PDF resumes are allowed");
 
-      // PDF VALIDATION
-      if (
-        selectedFile.type !==
-        "application/pdf"
-      ) {
+      return;
+    }
 
-        toast.error(
-          "Only PDF resumes are allowed"
-        );
-
-        return;
-      }
-
-      setFile(selectedFile);
-    };
+    setFile(selectedFile);
+  };
 
   // UPLOAD
-  const handleUpload =
-    async () => {
+  const handleUpload = async () => {
+    if (!file) {
+      showToast.error("Select a resume file");
 
-      if (!file) {
+      return;
+    }
 
-        toast.error(
-          "Select a resume file"
-        );
+    try {
+      setLoading(true);
 
-        return;
+      const response = await uploadResume(file);
+
+      console.log(response);
+
+      // UPDATE AUTH USER
+      setUser(response.data);
+
+      showToast.success("Resume uploaded successfully");
+
+      setFile(null);
+
+      if (onUploadSuccess) {
+        onUploadSuccess();
       }
+    } catch (err) {
+      console.log(err);
 
-      try {
-
-        setLoading(true);
-
-        const response =
-          await uploadResume(
-            file
-          );
-
-          console.log(response);
-
-        // UPDATE AUTH USER
-        setUser(
-          response.data
-        );
-
-        toast.success(
-          "Resume uploaded successfully"
-        );
-
-        setFile(null);
-
-        if (
-          onUploadSuccess
-        ) {
-
-          onUploadSuccess();
-        }
-
-      } catch (err) {
-
-        console.log(err);
-
-        toast.error(
-
-          err.response?.data
-            ?.message ||
-
-          "Resume upload failed"
-        );
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+      showToast.error(err.response?.data?.message || "Resume upload failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -135,7 +85,6 @@ function ResumeUploadForm({
         p-8
       "
     >
-
       {/* TITLE */}
       <h2
         className="
@@ -149,7 +98,6 @@ function ResumeUploadForm({
 
       {/* CURRENT RESUME */}
       {user?.resumeUrl && (
-
         <a
           href={user.resumeUrl}
           target="_blank"
@@ -167,20 +115,14 @@ function ResumeUploadForm({
             hover:bg-blue-50
           "
         >
-
           <FileText size={20} />
 
-          <span>
-            View Current Resume
-          </span>
-
+          <span>View Current Resume</span>
         </a>
-
       )}
 
       {/* INPUT */}
       <div className="mt-8">
-
         <label
           className="
             flex
@@ -199,7 +141,6 @@ function ResumeUploadForm({
             hover:bg-blue-50/30
           "
         >
-
           <Upload
             size={38}
             className="
@@ -212,7 +153,6 @@ function ResumeUploadForm({
               text-center
             "
           >
-
             <p
               className="
                 font-medium
@@ -233,7 +173,6 @@ function ResumeUploadForm({
             </p>
 
             {file && (
-
               <p
                 className="
                   mt-3
@@ -244,22 +183,16 @@ function ResumeUploadForm({
               >
                 {file.name}
               </p>
-
             )}
-
           </div>
 
           <input
             type="file"
             accept=".pdf"
-            onChange={
-              handleFileChange
-            }
+            onChange={handleFileChange}
             className="hidden"
           />
-
         </label>
-
       </div>
 
       {/* BUTTON */}
@@ -279,9 +212,7 @@ function ResumeUploadForm({
           disabled:opacity-70
         "
       >
-
         {loading ? (
-
           <div
             className="
               flex
@@ -289,23 +220,14 @@ function ResumeUploadForm({
               gap-2
             "
           >
-
             <Spinner size="sm" />
 
-            <span>
-              Uploading...
-            </span>
-
+            <span>Uploading...</span>
           </div>
-
         ) : (
-
           "Upload Resume"
-
         )}
-
       </button>
-
     </div>
   );
 }

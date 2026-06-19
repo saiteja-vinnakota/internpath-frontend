@@ -1,84 +1,45 @@
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import toast
-from "react-hot-toast";
+import { showToast } from "../../utils/toastService";
 
-import DashboardLayout
-from "../../components/layout/DashboardLayout";
+import { TOAST_MESSAGES } from "../../constants/toastMessages";
 
-import PageHeader
-from "../../components/layout/PageHeader";
+import DashboardLayout from "../../components/layout/DashboardLayout";
 
-import JobPostForm
-from "../../components/forms/JobPostForm";
+import PageHeader from "../../components/layout/PageHeader";
 
-import useJobs
-from "../../hooks/useJobs";
+import JobPostForm from "../../components/forms/JobPostForm";
+
+import useJobs from "../../hooks/useJobs";
 
 function PostJobPage() {
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
+  const { handleCreateJob } = useJobs();
 
-  const {
-
-    handleCreateJob,
-
-  } = useJobs();
-
-  const [
-
-    submitting,
-
-    setSubmitting,
-
-  ] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // SUBMIT
-  const submitHandler =
-    async (formData) => {
+  const submitHandler = async (formData) => {
+    try {
+      setSubmitting(true);
 
-      try {
+      await handleCreateJob(formData);
 
-        setSubmitting(true);
+      showToast.success("Internship posted successfully");
 
-        await handleCreateJob(
-          formData
-        );
-
-        toast.success(
-          "Internship posted successfully"
-        );
-
-        navigate(
-          "/recruiter/manage-listings"
-        );
-
-      } catch (err) {
-
-        toast.error(
-
-          err.response?.data
-            ?.message ||
-
-          "Failed to post internship"
-        );
-
-      } finally {
-
-        setSubmitting(false);
-      }
-    };
+      navigate("/recruiter/manage-listings");
+    } catch (err) {
+      showToast.error(err.response?.data?.message || "Failed to post internship");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <DashboardLayout>
-
       {/* HEADER */}
       <PageHeader
         title="
@@ -93,18 +54,8 @@ function PostJobPage() {
 
       {/* FORM */}
       <div className="mt-8">
-
-        <JobPostForm
-          onSubmit={
-            submitHandler
-          }
-          loading={
-            submitting
-          }
-        />
-
+        <JobPostForm onSubmit={submitHandler} loading={submitting} />
       </div>
-
     </DashboardLayout>
   );
 }

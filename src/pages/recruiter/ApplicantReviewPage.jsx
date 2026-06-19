@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { Search, Users, Sparkles, ArrowUpDown, Filter } from "lucide-react";
 
-import toast from "react-hot-toast";
+import { showToast } from "../../utils/toastService";
 
 import DashboardLayout from "../../components/layout/DashboardLayout";
 
@@ -231,11 +231,9 @@ function ApplicantReviewPage() {
         nextStatus,
       );
 
-      toast.success(`Applicant moved to ${nextStatus}`);
-
       closeModal();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update status");
+      showToast.error(err.response?.data?.message || "Failed to update status");
     } finally {
       setActionLoading(false);
     }

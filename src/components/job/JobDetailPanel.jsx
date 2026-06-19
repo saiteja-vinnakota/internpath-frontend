@@ -16,7 +16,7 @@ import {
 
 import { useEffect } from "react";
 
-import toast from "react-hot-toast";
+import { showToast } from "../../utils/toastService";
 
 import { useAuth } from "../../context/AuthContext";
 
@@ -128,7 +128,7 @@ function JobDetailPanel({ job, aiScore = 0 }) {
   // APPLY
   const handleApply = async () => {
     if (!user?.resumeUrl) {
-      toast.error("Please upload your resume before applying.");
+      showToast.error("Please upload your resume before applying.");
 
       return;
     }

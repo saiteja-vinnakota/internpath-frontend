@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 
-import toast from "react-hot-toast";
+import { showToast } from "../utils/toastService";
+
+import { TOAST_MESSAGES } from "../constants/toastMessages";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -33,7 +35,7 @@ function useSavedJobs() {
       // AVOID NOISY TOASTS
       // FOR AUTH / ROLE ISSUES
       if (error.response?.status !== 401 && error.response?.status !== 403) {
-        toast.error("Failed to load saved jobs");
+        showToast.error("Failed to load saved jobs");
       }
     } finally {
       setLoading(false);
@@ -49,11 +51,11 @@ function useSavedJobs() {
     try {
       await saveJob(jobId);
 
-      toast.success("Job saved successfully");
+      showToast.success("Job saved successfully");
 
       await fetchSavedJobs();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to save job");
+      showToast.error(error.response?.data?.message || "Failed to save job");
     }
   };
 
@@ -66,11 +68,11 @@ function useSavedJobs() {
     try {
       await removeSavedJob(jobId);
 
-      toast.success("Removed from saved jobs");
+      showToast.success("Removed from saved jobs");
 
       setSavedJobs((prev) => prev.filter((item) => item.job._id !== jobId));
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to remove job");
+      showToast.error(error.response?.data?.message || "Failed to remove job");
     }
   };
 

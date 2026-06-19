@@ -1,150 +1,90 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import toast
-from "react-hot-toast";
+import { showToast } from "../../utils/toastService";
 
-import DashboardLayout
-from "../../components/layout/DashboardLayout";
+import { TOAST_MESSAGES } from "../../constants/toastMessages";
 
-import PageHeader
-from "../../components/layout/PageHeader";
+import DashboardLayout from "../../components/layout/DashboardLayout";
 
-import JobPostForm
-from "../../components/forms/JobPostForm";
+import PageHeader from "../../components/layout/PageHeader";
 
-import Skeleton
-from "../../components/ui/Skeleton";
+import JobPostForm from "../../components/forms/JobPostForm";
 
-import EmptyState
-from "../../components/ui/EmptyState";
+import Skeleton from "../../components/ui/Skeleton";
 
-import {
-  getSingleJob,
-} from "../../api/jobApi";
+import EmptyState from "../../components/ui/EmptyState";
 
-import useJobs
-from "../../hooks/useJobs";
+import { getSingleJob } from "../../api/jobApi";
 
-import {
-  getErrorMessage,
-} from "../../utils/errorHandler";
+import useJobs from "../../hooks/useJobs";
+
+import { getErrorMessage } from "../../utils/errorHandler";
 
 function EditJobPage() {
+  const { id } = useParams();
 
-  const { id } =
-    useParams();
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
+  const { handleUpdateJob } = useJobs();
 
-  const {
+  const [job, setJob] = useState(null);
 
-    handleUpdateJob,
+  const [loading, setLoading] = useState(true);
 
-  } = useJobs();
+  const [submitLoading, setSubmitLoading] = useState(false);
 
-  const [job, setJob] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [
-
-    submitLoading,
-
-    setSubmitLoading,
-
-  ] = useState(false);
-
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
   // FETCH JOB
   useEffect(() => {
-
-    const fetchJob =
-      async () => {
-
-        try {
-
-          setLoading(true);
-
-          setError("");
-
-          const data =
-            await getSingleJob(id);
-
-          setJob(
-            data?.data
-          );
-
-        } catch (err) {
-
-          console.log(err);
-
-          setError(
-            getErrorMessage(err)
-          );
-
-        } finally {
-
-          setLoading(false);
-        }
-      };
-
-    fetchJob();
-
-  }, [id]);
-
-  // SUBMIT
-  const handleSubmit =
-    async (formData) => {
-
+    const fetchJob = async () => {
       try {
+        setLoading(true);
 
-        setSubmitLoading(true);
+        setError("");
 
-        await handleUpdateJob(
+        const data = await getSingleJob(id);
 
-          id,
-
-          formData
-        );
-
-        toast.success(
-          "Internship updated successfully"
-        );
-
-        navigate(
-          "/recruiter/manage-listings"
-        );
-
+        setJob(data?.data);
       } catch (err) {
-
         console.log(err);
 
-        toast.error(
-          getErrorMessage(err)
-        );
-
+        setError(getErrorMessage(err));
       } finally {
-
-        setSubmitLoading(false);
+        setLoading(false);
       }
     };
 
+    fetchJob();
+  }, [id]);
+
+  // SUBMIT
+  const handleSubmit = async (formData) => {
+    try {
+      setSubmitLoading(true);
+
+      await handleUpdateJob(
+        id,
+
+        formData,
+      );
+
+      showToast.success("Internship updated successfully");
+
+      navigate("/recruiter/manage-listings");
+    } catch (err) {
+      console.log(err);
+
+      showToast.error(getErrorMessage(err));
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   return (
     <DashboardLayout>
-
       {/* HEADER */}
       <PageHeader
         title="
@@ -158,7 +98,6 @@ function EditJobPage() {
 
       {/* LOADING */}
       {loading && (
-
         <div
           className="
             mt-8
@@ -170,62 +109,40 @@ function EditJobPage() {
             space-y-6
           "
         >
-
-          {[...Array(8)].map(
-            (_, index) => (
-
-              <Skeleton
-                key={index}
-                className="
+          {[...Array(8)].map((_, index) => (
+            <Skeleton
+              key={index}
+              className="
                   h-16
                   rounded-2xl
                 "
-              />
-
-            )
-          )}
-
+            />
+          ))}
         </div>
-
       )}
 
       {/* ERROR */}
       {!loading && error && (
-
         <div className="mt-8">
-
           <EmptyState
             title="
               Failed to load internship
             "
             description={error}
           />
-
         </div>
-
       )}
 
       {/* FORM */}
-      {!loading &&
-        !error &&
-        job && (
-
+      {!loading && !error && job && (
         <div className="mt-8">
-
           <JobPostForm
             initialData={job}
-            onSubmit={
-              handleSubmit
-            }
-            loading={
-              submitLoading
-            }
+            onSubmit={handleSubmit}
+            loading={submitLoading}
           />
-
         </div>
-
       )}
-
     </DashboardLayout>
   );
 }

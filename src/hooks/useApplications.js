@@ -1,111 +1,65 @@
 import { useState } from "react";
 
-import toast from "react-hot-toast";
+import { showToast } from "../utils/toastService";
 
-import {
-  applyToJob,
-  getMyApplications,
-} from "../api/applicationApi";
+import { TOAST_MESSAGES } from "../constants/toastMessages";
+
+import { applyToJob, getMyApplications } from "../api/applicationApi";
 
 function useApplications() {
+  const [applications, setApplications] = useState([]);
 
-  const [applications, setApplications] =
-    useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
-
-  const [applyingJobId, setApplyingJobId] =
-    useState(null);
+  const [applyingJobId, setApplyingJobId] = useState(null);
 
   // FETCH APPLICATIONS
-  const fetchApplications =
-    async () => {
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
 
-      try {
+      const response = await getMyApplications();
 
-        setLoading(true);
+      setApplications(response.data || []);
+    } catch (error) {
+      console.log(error);
 
-        const response =
-          await getMyApplications();
-
-        setApplications(
-          response.data || []
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-        toast.error(
-          "Failed to load applications"
-        );
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+      showToast.error("Failed to load applications");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // CHECK ALREADY APPLIED
-  const hasApplied =
-    (jobId) => {
-
-      return applications.some(
-
-        (application) =>
-
-          application.job?._id ===
-          jobId
-
-      );
-    };
+  const hasApplied = (jobId) => {
+    return applications.some((application) => application.job?._id === jobId);
+  };
 
   // APPLY TO JOB
-  const handleApply =
-    async (jobId) => {
+  const handleApply = async (jobId) => {
+    try {
+      setApplyingJobId(jobId);
 
-      try {
+      const response = await applyToJob(jobId);
 
-        setApplyingJobId(jobId);
+      showToast.success(response.message || TOAST_MESSAGES.APPLICATION.APPLIED_SUCCESS);
 
-        const response =
-          await applyToJob(jobId);
+      // REFRESH APPLICATIONS
+      await fetchApplications();
 
-        toast.success(
+      return true;
+    } catch (error) {
+      console.log(error);
 
-          response.message ||
-          "Application submitted"
+      showToast.error(error.response?.data?.message || TOAST_MESSAGES.APPLICATION.APPLIED_FAILED);
 
-        );
-
-        // REFRESH APPLICATIONS
-        await fetchApplications();
-
-        return true;
-
-      } catch (error) {
-
-        console.log(error);
-
-        toast.error(
-
-          error.response?.data
-            ?.message ||
-
-          "Failed to apply"
-        );
-
-        return false;
-
-      } finally {
-
-        setApplyingJobId(null);
-      }
-    };
+      return false;
+    } finally {
+      setApplyingJobId(null);
+    }
+  };
 
   return {
-
     applications,
 
     loading,

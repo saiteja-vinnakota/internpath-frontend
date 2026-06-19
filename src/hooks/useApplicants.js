@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-import toast from "react-hot-toast";
+import { showToast } from "../utils/toastService";
+
+import { TOAST_MESSAGES } from "../constants/toastMessages";
 
 import {
   getApplicantsByJob,
@@ -75,18 +77,18 @@ function useApplicants() {
 
       // TOASTS
       if (status === "shortlisted") {
-        toast.success("Applicant shortlisted");
+        showToast.success("Applicant shortlisted");
       } else if (status === "interview") {
-        toast.success("Interview stage started");
+        showToast.success("Interview stage started");
       } else if (status === "selected") {
-        toast.success("Applicant selected");
+        showToast.success("Applicant selected");
       } else if (status === "rejected") {
-        toast.success("Applicant rejected");
+        showToast.success("Applicant rejected");
       }
     } catch (err) {
       console.log(err);
 
-      toast.error(err.response?.data?.message || "Failed to update status");
+      showToast.error(err.response?.data?.message || "Failed to update status");
 
       throw err;
     } finally {

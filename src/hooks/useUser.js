@@ -1,71 +1,41 @@
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
-import toast
-from "react-hot-toast";
+import { showToast } from "../utils/toastService";
 
-import {
-  updateUserProfile,
-} from "../api/userApi";
+import { TOAST_MESSAGES } from "../constants/toastMessages";
 
-import {
-  useAuth,
-} from "../context/AuthContext";
+import { updateUserProfile } from "../api/userApi";
+
+import { useAuth } from "../context/AuthContext";
 
 function useUser() {
+  const { setUser } = useAuth();
 
-  const {
-    setUser,
-  } = useAuth();
-
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   // UPDATE PROFILE
-  const updateProfile =
-    async (formData) => {
+  const updateProfile = async (formData) => {
+    try {
+      setLoading(true);
 
-      try {
+      const data = await updateUserProfile(formData);
 
-        setLoading(true);
+      // UPDATE GLOBAL AUTH USER
+      setUser(data.data);
 
-        const data =
-          await updateUserProfile(
-            formData
-          );
+      showToast.success("Profile updated successfully");
 
-        // UPDATE GLOBAL AUTH USER
-        setUser(
-          data.data
-        );
+      return data;
+    } catch (err) {
+      console.log(err);
 
-        toast.success(
-          "Profile updated successfully"
-        );
-
-        return data;
-
-      } catch (err) {
-
-        console.log(err);
-
-        toast.error(
-
-          err.response?.data
-            ?.message ||
-
-          "Failed to update profile"
-        );
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+      showToast.error(err.response?.data?.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
-
     loading,
 
     updateProfile,

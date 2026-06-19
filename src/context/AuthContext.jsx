@@ -2,11 +2,13 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import toast from "react-hot-toast";
-
 import { loginUser, registerUser } from "../api/authApi";
 
 import { getCurrentUser } from "../api/userApi";
+
+import { showToast } from "../utils/toastService";
+
+import { TOAST_MESSAGES, getToastMessage } from "../constants/toastMessages";
 
 const AuthContext = createContext();
 
@@ -63,12 +65,12 @@ export function AuthProvider({ children }) {
 
       await loadUser();
 
-      toast.success("Login successful");
+      showToast.success(TOAST_MESSAGES.AUTH.LOGIN_SUCCESS);
 
       // REDIRECT
       navigate(`/${data.data.user.role}/dashboard`);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      showToast.error(err.response?.data?.message || TOAST_MESSAGES.AUTH.LOGIN_FAILED);
 
       throw err;
     } finally {
@@ -95,12 +97,12 @@ export function AuthProvider({ children }) {
 
       await loadUser();
 
-      toast.success("Account created successfully");
+      showToast.success(TOAST_MESSAGES.AUTH.REGISTER_SUCCESS);
 
       // REDIRECT
       navigate(`/${data.data.user.role}/dashboard`);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      showToast.error(err.response?.data?.message || TOAST_MESSAGES.AUTH.REGISTER_FAILED);
 
       throw err;
     } finally {
@@ -114,7 +116,7 @@ export function AuthProvider({ children }) {
 
     setUser(null);
 
-    toast.success("Logged out successfully");
+    showToast.success(TOAST_MESSAGES.AUTH.LOGOUT_SUCCESS);
 
     navigate("/login");
   };
