@@ -54,12 +54,15 @@ function StudentDashboard() {
 
   // SAVED JOBS
   const {
-
-    savedJobs = [],
+    savedJobs,
 
     fetchSavedJobs,
 
+    handleSaveJob,
+
+    handleRemoveSavedJob,
   } = useSavedJobs();
+
 
   // FETCH ALL
   useEffect(() => {
@@ -70,7 +73,7 @@ function StudentDashboard() {
 
     fetchSavedJobs();
 
-  }, []);
+  }, [fetchSavedJobs]);
 
   // COUNTS
   const totalApplications =
@@ -196,6 +199,9 @@ function StudentDashboard() {
           <JobList
             jobs={jobs}
             loading={loading}
+            savedJobs={savedJobs}
+            onSave={handleSaveJob}
+            onRemove={handleRemoveSavedJob}
             emptyTitle="
               No jobs found
             "
