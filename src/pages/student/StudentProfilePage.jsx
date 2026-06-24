@@ -1,17 +1,14 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  X,
-} from "lucide-react";
+import { X } from "lucide-react";
 
 import DashboardLayout from "../../components/layout/DashboardLayout";
 
 import PageHeader from "../../components/layout/PageHeader";
 
 import ProfileForm from "../../components/forms/ProfileForm";
+
+import ProfilePictureUploadForm from "../../components/forms/ProfilePictureUploadForm";
 
 import ResumeUploadForm from "../../components/forms/ResumeUploadForm";
 
@@ -26,8 +23,7 @@ import useUser from "../../hooks/useUser";
 import { useAuth } from "../../context/AuthContext";
 
 function StudentProfilePage() {
-  const [editMode, setEditMode] =
-    useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   // GLOBAL AUTH USER
   const { user, loading: authLoading } = useAuth();
@@ -39,17 +35,13 @@ function StudentProfilePage() {
     updateProfile,
   } = useUser();
 
-  const handleProfileUpdate =
-    async (payload) => {
+  const handleProfileUpdate = async (payload) => {
+    const data = await updateProfile(payload);
 
-      const data =
-        await updateProfile(payload);
-
-      if (data) {
-
-        setEditMode(false);
-      }
-    };
+    if (data) {
+      setEditMode(false);
+    }
+  };
 
   if (authLoading || !user) {
     return (
@@ -144,26 +136,18 @@ function StudentProfilePage() {
         >
           <Button
             type="button"
-            onClick={() =>
-              setEditMode(
-                (current) => !current
-              )
-            }
+            onClick={() => setEditMode((current) => !current)}
           >
-            {editMode
-              ? "Close Editor"
-              : "Edit Profile"}
+            {editMode ? "Close Editor" : "Edit Profile"}
           </Button>
         </div>
 
         {editMode && (
-
-          <EditProfileModal
-            onClose={() =>
-              setEditMode(false)
-            }
-          >
+          <EditProfileModal onClose={() => setEditMode(false)}>
             <div className="space-y-8">
+              {/* PROFILE PICTURE */}
+              <ProfilePictureUploadForm user={user} />
+
               {/* PROFILE */}
               <ProfileForm
                 user={user}
@@ -175,39 +159,23 @@ function StudentProfilePage() {
               <ResumeUploadForm user={user} />
             </div>
           </EditProfileModal>
-
         )}
       </div>
     </DashboardLayout>
   );
 }
 
-function EditProfileModal({
-  children,
-  onClose,
-}) {
+function EditProfileModal({ children, onClose }) {
   useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
 
-    const handleKeyDown =
-      (event) => {
+    window.addEventListener("keydown", handleKeyDown);
 
-        if (event.key === "Escape") {
-
-          onClose();
-        }
-      };
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    return () =>
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
   return (
@@ -247,9 +215,7 @@ function EditProfileModal({
           shadow-[0_20px_80px_rgba(0,0,0,0.2)]
           overflow-hidden
         "
-        onClick={(event) =>
-          event.stopPropagation()
-        }
+        onClick={(event) => event.stopPropagation()}
       >
         <div
           className="

@@ -16,19 +16,18 @@ import {
 
 import Avatar from "../ui/Avatar";
 
-function StudentProfileOverview({
-  user,
-}) {
-  const skills =
-    normalizeList(user?.skills);
+function StudentProfileOverview({ user }) {
+  const skills = normalizeList(user?.skills);
 
-  const careerInterests =
-    normalizeList(user?.careerInterests);
+  const careerInterests = normalizeList(user?.careerInterests);
 
-  const achievements =
-    normalizeList(user?.achievements);
+  const achievements = normalizeList(user?.achievements);
 
   const profileItems = [
+    {
+      label: "Profile Picture",
+      complete: Boolean(user?.profilePicture),
+    },
     {
       label: "Bio",
       complete: Boolean(user?.bio),
@@ -67,28 +66,19 @@ function StudentProfileOverview({
     },
   ];
 
-  const completedFields =
-    profileItems.filter((item) =>
-      item.complete
-    ).length;
+  const completedFields = profileItems.filter((item) => item.complete).length;
 
-  const profileStrength =
-    Math.round(
-      (completedFields / profileItems.length) * 100
-    );
+  const profileStrength = Math.round(
+    (completedFields / profileItems.length) * 100,
+  );
 
-  const missingItems =
-    profileItems.filter((item) =>
-      !item.complete
-    );
+  const missingItems = profileItems.filter((item) => !item.complete);
 
-  const title =
-    getProfileTitle(skills);
+  const title = getProfileTitle(skills);
 
-  const resumeWordCount =
-    user?.resumeText
-      ? user.resumeText.trim().split(/\s+/).filter(Boolean).length
-      : 0;
+  const resumeWordCount = user?.resumeText
+    ? user.resumeText.trim().split(/\s+/).filter(Boolean).length
+    : 0;
 
   return (
     <div className="space-y-8">
@@ -223,11 +213,7 @@ function StudentProfileOverview({
 
                 <HeroChip
                   icon={<FileText size={16} />}
-                  label={
-                    user?.resumeUrl
-                      ? "Resume uploaded"
-                      : "Resume needed"
-                  }
+                  label={user?.resumeUrl ? "Resume uploaded" : "Resume needed"}
                   success={Boolean(user?.resumeUrl)}
                 />
               </div>
@@ -277,9 +263,7 @@ function StudentProfileOverview({
             profileStrength={profileStrength}
           />
 
-          <MissingInformationCard
-            missingItems={missingItems}
-          />
+          <MissingInformationCard missingItems={missingItems} />
 
           <ProfileSection title="About Me">
             <p
@@ -304,15 +288,13 @@ function StudentProfileOverview({
             {achievements.length > 0 ? (
               <div className="space-y-4">
                 {achievements.map((achievement) => (
-                  <AchievementItem
-                    key={achievement}
-                    label={achievement}
-                  />
+                  <AchievementItem key={achievement} label={achievement} />
                 ))}
               </div>
             ) : (
               <EmptyText>
-                Add achievements like projects, awards, certifications, or coding milestones.
+                Add achievements like projects, awards, certifications, or
+                coding milestones.
               </EmptyText>
             )}
           </ProfileSection>
@@ -363,9 +345,7 @@ function StudentProfileOverview({
                 </div>
               </div>
             ) : (
-              <EmptyText>
-                Add your college to complete this section.
-              </EmptyText>
+              <EmptyText>Add your college to complete this section.</EmptyText>
             )}
           </ProfileSection>
         </div>
@@ -463,9 +443,7 @@ function ProfileStrengthCard({
   );
 }
 
-function MissingInformationCard({
-  missingItems,
-}) {
+function MissingInformationCard({ missingItems }) {
   if (missingItems.length === 0) {
     return (
       <section
@@ -479,10 +457,7 @@ function MissingInformationCard({
         "
       >
         <div className="flex gap-4">
-          <CheckCircle2
-            size={24}
-            className="mt-1 text-green"
-          />
+          <CheckCircle2 size={24} className="mt-1 text-green" />
 
           <div>
             <h2
@@ -524,10 +499,7 @@ function MissingInformationCard({
       "
     >
       <div className="flex gap-4">
-        <AlertCircle
-          size={24}
-          className="mt-1 text-accent"
-        />
+        <AlertCircle size={24} className="mt-1 text-accent" />
 
         <div>
           <h2
@@ -582,11 +554,7 @@ function MissingInformationCard({
   );
 }
 
-function ResumeInsightsCard({
-  user,
-  skillCount,
-  resumeWordCount,
-}) {
+function ResumeInsightsCard({ user, skillCount, resumeWordCount }) {
   return (
     <section
       className="
@@ -631,9 +599,7 @@ function ResumeInsightsCard({
           </p>
         </div>
 
-        <IconBox
-          success={Boolean(user?.resumeUrl)}
-        >
+        <IconBox success={Boolean(user?.resumeUrl)}>
           <FileText size={22} />
         </IconBox>
       </div>
@@ -641,11 +607,7 @@ function ResumeInsightsCard({
       <div className="mt-6 space-y-4">
         <InsightRow
           label="Status"
-          value={
-            user?.resumeUrl
-              ? "Uploaded"
-              : "Missing"
-          }
+          value={user?.resumeUrl ? "Uploaded" : "Missing"}
           success={Boolean(user?.resumeUrl)}
         />
 
@@ -654,25 +616,17 @@ function ResumeInsightsCard({
           value={`Version ${user?.resumeVersion || 1}`}
         />
 
-        <InsightRow
-          label="Skills Detected"
-          value={`${skillCount}`}
-        />
+        <InsightRow label="Skills Detected" value={`${skillCount}`} />
 
         <InsightRow
           label="Resume Text"
           value={
-            resumeWordCount
-              ? `${resumeWordCount} words`
-              : "Not parsed yet"
+            resumeWordCount ? `${resumeWordCount} words` : "Not parsed yet"
           }
         />
 
         {user?.updatedAt && (
-          <InsightRow
-            label="Last Updated"
-            value={formatDate(user.updatedAt)}
-          />
+          <InsightRow label="Last Updated" value={formatDate(user.updatedAt)} />
         )}
       </div>
 
@@ -700,10 +654,7 @@ function ResumeInsightsCard({
   );
 }
 
-function ProfileSection({
-  title,
-  children,
-}) {
+function ProfileSection({ title, children }) {
   return (
     <section
       className="
@@ -726,23 +677,14 @@ function ProfileSection({
         {title}
       </h2>
 
-      <div className="mt-5">
-        {children}
-      </div>
+      <div className="mt-5">{children}</div>
     </section>
   );
 }
 
-function ChipList({
-  items,
-  emptyText,
-}) {
+function ChipList({ items, emptyText }) {
   if (items.length === 0) {
-    return (
-      <EmptyText>
-        {emptyText}
-      </EmptyText>
-    );
+    return <EmptyText>{emptyText}</EmptyText>;
   }
 
   return (
@@ -769,9 +711,7 @@ function ChipList({
   );
 }
 
-function AchievementItem({
-  label,
-}) {
+function AchievementItem({ label }) {
   return (
     <div className="flex gap-4">
       <IconBox>
@@ -792,11 +732,7 @@ function AchievementItem({
   );
 }
 
-function InsightRow({
-  label,
-  value,
-  success = false,
-}) {
+function InsightRow({ label, value, success = false }) {
   return (
     <div
       className="
@@ -823,9 +759,7 @@ function InsightRow({
         className={`
           text-sm
           font-semibold
-          ${success
-            ? "text-green"
-            : "text-primary"}
+          ${success ? "text-green" : "text-primary"}
         `}
       >
         {value}
@@ -834,10 +768,7 @@ function InsightRow({
   );
 }
 
-function InlineMeta({
-  icon,
-  label,
-}) {
+function InlineMeta({ icon, label }) {
   return (
     <span
       className="
@@ -852,11 +783,7 @@ function InlineMeta({
   );
 }
 
-function HeroChip({
-  icon,
-  label,
-  success = false,
-}) {
+function HeroChip({ icon, label, success = false }) {
   return (
     <span
       className={`
@@ -868,9 +795,7 @@ function HeroChip({
         px-4
         text-sm
         font-semibold
-        ${success
-          ? "bg-green/10 text-green"
-          : "bg-stone text-primary"}
+        ${success ? "bg-green/10 text-green" : "bg-stone text-primary"}
       `}
     >
       {icon}
@@ -879,11 +804,7 @@ function HeroChip({
   );
 }
 
-function ProfileLink({
-  href,
-  icon,
-  label,
-}) {
+function ProfileLink({ href, icon, label }) {
   if (!href) {
     return null;
   }
@@ -917,11 +838,7 @@ function ProfileLink({
   );
 }
 
-function IconBox({
-  children,
-  accent = false,
-  success = false,
-}) {
+function IconBox({ children, accent = false, success = false }) {
   return (
     <div
       className={`
@@ -932,11 +849,13 @@ function IconBox({
         items-center
         justify-center
         rounded-2xl
-        ${success
-          ? "bg-green/10 text-green"
-          : accent
-            ? "bg-blue-50 text-accent"
-            : "bg-stone text-primary"}
+        ${
+          success
+            ? "bg-green/10 text-green"
+            : accent
+              ? "bg-blue-50 text-accent"
+              : "bg-stone text-primary"
+        }
       `}
     >
       {children}
@@ -944,9 +863,7 @@ function IconBox({
   );
 }
 
-function EmptyText({
-  children,
-}) {
+function EmptyText({ children }) {
   return (
     <p
       className="
@@ -960,55 +877,38 @@ function EmptyText({
 }
 
 function normalizeList(value) {
-  return Array.isArray(value)
-    ? value.filter(Boolean)
-    : [];
+  return Array.isArray(value) ? value.filter(Boolean) : [];
 }
 
 function getProfileTitle(skills) {
-  const normalizedSkills =
-    skills.map((skill) =>
-      skill.toLowerCase()
-    );
+  const normalizedSkills = skills.map((skill) => skill.toLowerCase());
 
-  const hasFrontend =
-    hasAnySkill(
-      normalizedSkills,
-      [
-        "react",
-        "javascript",
-        "tailwind",
-        "redux",
-        "html",
-        "css",
-      ]
-    );
+  const hasFrontend = hasAnySkill(normalizedSkills, [
+    "react",
+    "javascript",
+    "tailwind",
+    "redux",
+    "html",
+    "css",
+  ]);
 
-  const hasBackend =
-    hasAnySkill(
-      normalizedSkills,
-      [
-        "node",
-        "express",
-        "java",
-        "spring",
-        "mongodb",
-        "mysql",
-        "sql",
-        "api",
-      ]
-    );
+  const hasBackend = hasAnySkill(normalizedSkills, [
+    "node",
+    "express",
+    "java",
+    "spring",
+    "mongodb",
+    "mysql",
+    "sql",
+    "api",
+  ]);
 
-  const hasAi =
-    hasAnySkill(
-      normalizedSkills,
-      [
-        "python",
-        "machine learning",
-        "tensorflow",
-        "pandas",
-      ]
-    );
+  const hasAi = hasAnySkill(normalizedSkills, [
+    "python",
+    "machine learning",
+    "tensorflow",
+    "pandas",
+  ]);
 
   if (hasFrontend && hasBackend) {
     return "Full Stack Developer";
@@ -1029,28 +929,18 @@ function getProfileTitle(skills) {
   return "Student Developer";
 }
 
-function hasAnySkill(
-  skills,
-  keywords
-) {
+function hasAnySkill(skills, keywords) {
   return skills.some((skill) =>
-    keywords.some((keyword) =>
-      skill.includes(keyword)
-    )
+    keywords.some((keyword) => skill.includes(keyword)),
   );
 }
 
 function formatDate(dateValue) {
-  return new Intl.DateTimeFormat(
-    "en-IN",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(
-    new Date(dateValue)
-  );
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(dateValue));
 }
 
 export default StudentProfileOverview;

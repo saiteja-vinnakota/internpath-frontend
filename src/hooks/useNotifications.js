@@ -1,116 +1,63 @@
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
-import {
-
-  getNotifications,
-
-  markNotificationRead,
-
-} from "../api/notificationApi";
+import { getNotifications, markNotificationRead } from "../api/notificationApi";
 
 function useNotifications() {
+  const [notifications, setNotifications] = useState([]);
 
-  const [
+  const [loading, setLoading] = useState(false);
 
-    notifications,
-
-    setNotifications,
-
-  ] = useState([]);
-
-  const [
-
-    loading,
-
-    setLoading,
-
-  ] = useState(false);
-
-  const [
-
-    error,
-
-    setError,
-
-  ] = useState("");
+  const [error, setError] = useState("");
 
   // FETCH
-  const fetchNotifications =
-    async () => {
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
 
-      try {
+      setError("");
 
-        setLoading(true);
+      const data = await getNotifications();
 
-        setError("");
-
-        const data =
-          await getNotifications();
-
-        setNotifications(
-          data.data || []
-        );
-
-      } catch (err) {
-
-        setError(
-
-          err.response?.data?.message ||
-
-          "Failed to load notifications"
-        );
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+      setNotifications(data.data || []);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // MARK READ
-  const handleMarkRead =
-    async (id) => {
+  const handleMarkRead = async (id) => {
+    try {
+      await markNotificationRead(id);
 
-      try {
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification._id === id
+            ? {
+                ...notification,
+                isRead: true,
+              }
+            : notification,
+        ),
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-        await markNotificationRead(
-          id
-        );
+  // CLEAR
+  const clearNotifications = () => {
+    setNotifications([]);
 
-        setNotifications(
-          (prev) =>
+    setError("");
+  };
 
-            prev.map(
-              (notification) =>
-
-                notification._id === id
-
-                  ? {
-                      ...notification,
-                      isRead: true,
-                    }
-
-                  : notification
-            )
-        );
-
-      } catch (err) {
-
-        console.log(err);
-      }
-    };
-
-  const unreadCount =
-    notifications.filter(
-
-      (notification) =>
-
-        !notification.isRead
-    ).length;
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead,
+  ).length;
 
   return {
-
     notifications,
 
     loading,
@@ -122,6 +69,8 @@ function useNotifications() {
     fetchNotifications,
 
     handleMarkRead,
+
+    clearNotifications,
 
     setNotifications,
   };

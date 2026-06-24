@@ -1,51 +1,29 @@
-import {
+import { createContext, useContext, useEffect } from "react";
 
-  createContext,
+import useNotifications from "../hooks/useNotifications";
 
-  useContext,
+import { useAuth } from "./AuthContext";
 
-  useEffect,
+const NotificationContext = createContext();
 
-} from "react";
+export function NotificationProvider({ children }) {
+  const notificationState = useNotifications();
 
-import useNotifications
-from "../hooks/useNotifications";
-
-const NotificationContext =
-  createContext();
-
-export function NotificationProvider({
-
-  children,
-
-}) {
-
-  const notificationState =
-    useNotifications();
+  const { user } = useAuth();
 
   useEffect(() => {
-
-    notificationState
-      .fetchNotifications();
-
-  }, []);
+    if (user) {
+      notificationState.fetchNotifications();
+    } else {
+      notificationState.clearNotifications();
+    }
+  }, [user]);
 
   return (
-
-    <NotificationContext.Provider
-      value={
-        notificationState
-      }
-    >
-
+    <NotificationContext.Provider value={notificationState}>
       {children}
-
     </NotificationContext.Provider>
   );
 }
 
-export const useNotificationContext =
-  () =>
-    useContext(
-      NotificationContext
-    );
+export const useNotificationContext = () => useContext(NotificationContext);
