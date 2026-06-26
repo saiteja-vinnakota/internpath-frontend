@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import Topbar from "./Topbar";
+import Footer from "../landing/Footer";
 
 function RootLayout() {
 
@@ -20,6 +21,8 @@ function RootLayout() {
         <Outlet />
 
       </main>
+
+      <Footer />
 
     </div>
 

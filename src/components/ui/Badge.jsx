@@ -14,7 +14,6 @@ function Badge({
         rounded-full
         text-xs
         font-medium
-
         ${className}
       `}
     >

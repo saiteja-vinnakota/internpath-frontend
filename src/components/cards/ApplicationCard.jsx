@@ -9,485 +9,139 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-
 import ApplicationStatusBadge from "../application/ApplicationStatusBadge";
+import {formatDate} from "../../utils/formatDate";
+import {formatStipend} from "../../utils/formatCurrency";
 
-import Button from "../ui/Button";
+const formatCategory = (cat) =>
+  cat === "fullstack" ? "Full Stack"
+  : cat === "aiml" ? "AI/ML"
+  : cat === "datascience" ? "Data Science"
+  : cat;
+
+// match bar colors aligned with ApplicationStatusBadge palette
+function MatchBar({ score }) {
+  const s = score || 0;
+  if (s === 0) return null;
+
+  const style =
+    s >= 85
+      ? { bar: "#16a34a", bg: "bg-green-50",  text: "text-green-700",  label: "Excellent Match" }
+      : s >= 70
+      ? { bar: "#2563EB", bg: "bg-blue-50",   text: "text-blue-700",   label: "Strong Match"    }
+      : { bar: "#d97706", bg: "bg-amber-50",  text: "text-amber-700",  label: "Moderate Match"  };
+
+  return (
+    <div className="mt-4 flex items-center gap-3">
+      <Sparkles size={13} style={{ color: style.bar, flexShrink: 0 }} />
+      <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${s}%`, background: style.bar }}
+        />
+      </div>
+      <span className="text-xs font-bold text-primary tabular-nums">{s}%</span>
+      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${style.bg} ${style.text}`}>
+        {style.label}
+      </span>
+    </div>
+  );
+}
 
 function ApplicationCard({ application }) {
   const { job, status, createdAt, matchScore } = application;
+  const stipendFormatted = formatStipend(job?.stipend);
+  const isExpired = job?.deadline && new Date(job.deadline) < new Date();
 
   return (
-    <div
-      className="
-        bg-white
-        border
-        border-border
-        rounded-[32px]
-        p-7
-        transition-shadow
-        duration-200
-        hover:shadow-md
-      "
-    >
-      {/* HEADER */}
-      <div
-        className="
-          flex
-          items-start
-          justify-between
-          gap-4
-        "
-      >
-        {/* LEFT */}
-        <div className="flex-1">
-          {/* COMPANY + CATEGORY */}
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-              flex-wrap
-            "
-          >
-            <div
-              className="
-                inline-flex
-                items-center
-                gap-2
-                px-4
-                py-2
-                rounded-full
-                bg-stone
-                text-sm
-                text-muted
-              "
-            >
-              <Building2 size={16} />
+    <div className="bg-white border border-border rounded-[24px] p-5 transition-shadow duration-200 hover:shadow-md">
 
-              <span>{job?.company}</span>
-            </div>
+      {/* ── HEADER ── */}
+      <div className="flex items-start justify-between gap-4">
 
+        <div className="flex-1 min-w-0">
+          {/* BADGES */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone border border-border text-xs text-muted">
+              <Building2 size={11} />
+              {job?.company}
+            </span>
             {job?.category && (
-              <div
-                className="
-                  px-3
-                  py-1
-                  rounded-full
-                  bg-blue-50
-                  text-accent
-                  text-xs
-                  font-medium
-                "
-              >
-                {job.category === "fullstack"
-                  ? "Full Stack"
-                  : job.category === "aiml"
-                    ? "AI/ML"
-                    : job.category === "datascience"
-                      ? "Data Science"
-                      : job.category}
-              </div>
+              <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                {formatCategory(job.category)}
+              </span>
+            )}
+            {isExpired && (
+              <span className="px-2.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-medium">
+                Closed
+              </span>
             )}
           </div>
 
           {/* TITLE */}
-          <h2
-            className="
-              mt-4
-              text-2xl
-              font-semibold
-              leading-tight
-              text-primary
-            "
-          >
+          <h2 className="mt-2.5 text-base font-semibold leading-snug text-primary">
             {job?.title}
           </h2>
+
+          {/* META */}
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted">
+            {job?.location && (
+              <span className="flex items-center gap-1"><MapPin size={11} />{job.location}</span>
+            )}
+            {job?.mode && (
+              <span className="flex items-center gap-1 capitalize"><BriefcaseBusiness size={11} />{job.mode}</span>
+            )}
+            {job?.duration && (
+              <span className="flex items-center gap-1"><Clock3 size={11} />{job.duration}</span>
+            )}
+          </div>
         </div>
 
-        {job?.deadline && new Date(job.deadline) < new Date() && (
-          <div
-            className="
-              mt-4
-              inline-flex
-              items-center
-              rounded-full
-              bg-red-50
-              px-3
-              py-1
-              text-xs
-              font-medium
-              text-red-600
-            "
-          >
-            Applications Closed
-          </div>
-        )}
-
-        {/* STATUS */}
-        <div
-          className="
-            flex
-            flex-col
-            items-end
-            gap-2
-          "
-        >
-          <p
-            className="
-              text-xs
-              font-medium
-              uppercase
-              tracking-wide
-              text-muted
-            "
-          >
-            Current Stage
-          </p>
-
+        {/* STAGE */}
+        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+          <p className="text-[10px] font-medium uppercase tracking-wide text-muted">Stage</p>
           <ApplicationStatusBadge status={status} />
         </div>
+
       </div>
 
-      {/* META */}
-      <div
-        className="
-          mt-7
-          flex
-          flex-wrap
-          gap-5
-          text-muted
-        "
-      >
-        {/* LOCATION */}
-        <div
-          className="
-            flex
-            items-center
-            gap-2
-          "
-        >
-          <MapPin size={18} />
+      {/* ── MATCH BAR ── */}
+      <MatchBar score={matchScore} />
 
-          <span>{job?.location}</span>
-        </div>
+      {/* ── FOOTER ── */}
+      <div className="mt-4 pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3">
 
-        {/* MODE */}
-        <div
-          className="
-            flex
-            items-center
-            gap-2
-          "
-        >
-          <BriefcaseBusiness size={18} />
-
-          <span
-            className="
-              capitalize
-            "
-          >
-            {job?.mode}
-          </span>
-        </div>
-
-        {/* DURATION */}
-        {job?.duration && (
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <Clock3 size={18} />
-
-            <span>{job.duration}</span>
-          </div>
-        )}
-      </div>
-
-      {/* APPLICATION INSIGHTS */}
-      <div
-        className="
-          mt-8
-          p-5
-          rounded-[28px]
-          bg-stone
-          border
-          border-border
-        "
-      >
-        <div
-          className="
-            flex
-            flex-wrap
-            items-center
-            justify-between
-            gap-5
-          "
-        >
-          {/* LEFT */}
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-            "
-          >
-            <div
-              className="
-                w-11
-                h-11
-                rounded-2xl
-                bg-blue-50
-                flex
-                items-center
-                justify-center
-                text-accent
-              "
-            >
-              <Sparkles size={20} />
-            </div>
-
-            <div>
-              <p
-                className="
-                  text-sm
-                  text-muted
-                "
-              >
-                AI Match Score
-              </p>
-
-              <h3
-                className="
-                  mt-1
-                  text-2xl
-                  font-semibold
-                  text-primary
-                "
-              >
-                {matchScore || 0}%
-              </h3>
-            </div>
-          </div>
-
-          {/* MATCH QUALITY */}
-          <div
-            className={`
-              px-4
-              py-2
-              rounded-full
-              text-sm
-              font-semibold
-
-              ${
-                (matchScore || 0) >= 85
-                  ? `
-                  bg-green-50
-                  text-green-700
-                `
-                  : (matchScore || 0) >= 70
-                    ? `
-                  bg-blue-50
-                  text-blue-700
-                `
-                    : `
-                  bg-amber-50
-                  text-amber-700
-                `
+        <div className="flex flex-wrap gap-4 text-xs">
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted">Stipend</p>
+            <div className="mt-0.5 flex items-center gap-0.5 font-semibold text-primary">
+              {stipendFormatted
+                ? <span>{stipendFormatted}</span>
+                : <span className="text-muted font-medium">Unpaid</span>
               }
-            `}
-          >
-            {(matchScore || 0) >= 85
-              ? "Excellent Match"
-              : (matchScore || 0) >= 70
-                ? "Strong Match"
-                : "Moderate Match"}
-          </div>
-        </div>
-
-        {/* PROGRESS */}
-        <div
-          className="
-            mt-5
-            h-3
-            rounded-full
-            bg-border
-            overflow-hidden
-          "
-        >
-          <div
-            className={`
-              h-full
-              rounded-full
-              transition-all
-              duration-500
-
-              ${
-                (matchScore || 0) >= 85
-                  ? "bg-green-500"
-                  : (matchScore || 0) >= 70
-                    ? "bg-blue-500"
-                    : "bg-amber-500"
-              }
-            `}
-            style={{
-              width: `${matchScore || 0}%`,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* FOOTER */}
-      <div
-        className="
-          mt-8
-          pt-6
-          border-t
-          border-border
-          flex
-          flex-col
-          md:flex-row
-          md:items-center
-          md:justify-between
-          gap-5
-        "
-      >
-        {/* LEFT */}
-        <div
-          className="
-            flex
-            flex-wrap
-            items-center
-            gap-5
-          "
-        >
-          {/* STIPEND */}
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <IndianRupee
-              size={18}
-              className="
-                text-primary
-              "
-            />
-
-            <div>
-              <p
-                className="
-                  text-xs
-                  text-muted
-                "
-              >
-                Stipend
-              </p>
-
-              <p
-                className="
-                  text-base
-                  font-semibold
-                  text-primary
-                "
-              >
-                {job?.stipend ? `₹${job.stipend}/month` : "Unpaid"}
-              </p>
             </div>
           </div>
 
-          {/* APPLIED DATE */}
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <CalendarDays
-              size={18}
-              className="
-                text-primary
-              "
-            />
-
-            <div>
-              <p
-                className="
-                  text-xs
-                  text-muted
-                "
-              >
-                Applied On
-              </p>
-
-              <p
-                className="
-                  text-base
-                  font-medium
-                  text-primary
-                "
-              >
-                {new Date(createdAt).toLocaleDateString()}
-              </p>
-            </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted">Applied</p>
+            <p className="mt-0.5 font-medium text-primary">{formatDate(createdAt)}</p>
           </div>
 
           {job?.deadline && (
-            <div
-              className="
-                flex
-                items-center
-                gap-2
-              "
-            >
-              <CalendarDays
-                size={18}
-                className="
-                  text-primary
-                "
-              />
-
-              <div>
-                <p
-                  className="
-                    text-xs
-                    text-muted
-                  "
-                >
-                  Deadline
-                </p>
-
-                <p
-                  className="
-                    text-base
-                    font-medium
-                    text-primary
-                  "
-                >
-                  {new Date(job.deadline).toLocaleDateString()}
-                </p>
-              </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-muted">Deadline</p>
+              <p className="mt-0.5 font-medium text-primary">{formatDate(job.deadline)}</p>
             </div>
           )}
         </div>
 
-        {/* ACTION */}
-        <Link to={`/jobs/${job?._id}`}>
-          <Button
-            variant="secondary"
-            className="
-              rounded-2xl
-            "
-          >
-            View Job
-          </Button>
+        <Link
+          to={`/jobs/${job?._id}`}
+          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-primary hover:bg-stone transition-colors"
+        >
+          View Job →
         </Link>
+
       </div>
     </div>
   );

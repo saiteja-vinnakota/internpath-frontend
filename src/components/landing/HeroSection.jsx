@@ -1,83 +1,21 @@
 import { ArrowRight, BriefcaseBusiness, Sparkles, Users } from "lucide-react";
-
 import { Link } from "react-router-dom";
-
 import Button from "../ui/Button";
 
 function HeroSection() {
   return (
-    <section
-      id="home"
-      className="
-        relative
-        overflow-hidden
-        py-20
-        lg:py-28
-      "
-    >
-      <div
-        className="
-          max-w-7xl
-          mx-auto
-          px-5
-          sm:px-6
-          lg:px-8
-        "
-      >
-        <div
-          className="
-            grid
-            grid-cols-1
-            lg:grid-cols-2
-            gap-16
-            items-center
-          "
-        >
+    <section id="home" className="relative overflow-hidden py-20 lg:py-28">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
           {/* LEFT */}
           <div>
-            {/* BADGE */}
-            <div
-              className="
-                inline-flex
-                items-center
-                gap-2
-
-                px-4
-                py-2
-
-                rounded-full
-
-                bg-white
-                border
-                border-border
-
-                text-sm
-                text-primary
-                font-medium
-              "
-            >
-              <Sparkles size={16} />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-border text-sm text-primary font-medium">
+              <Sparkles size={14} className="text-accent" />
               AI Powered Internship Platform
             </div>
 
-            {/* TITLE */}
-            <h1
-              className="
-                mt-8
-
-                text-5xl
-                sm:text-6xl
-                lg:text-7xl
-
-                font-semibold
-
-                tracking-tight
-
-                text-primary
-
-                leading-[1.05]
-              "
-            >
+            <h1 className="mt-7 text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight text-primary leading-[1.05]">
               Find Internships
               <br />
               That Match
@@ -85,429 +23,97 @@ function HeroSection() {
               Your Skills
             </h1>
 
-            {/* DESCRIPTION */}
-            <p
-              className="
-                mt-8
-
-                max-w-xl
-
-                text-lg
-                leading-8
-
-                text-muted
-              "
-            >
+            <p className="mt-7 max-w-xl text-lg leading-8 text-muted">
               InternPath helps students discover relevant internships using
               AI-powered matching while enabling recruiters to identify
               qualified candidates faster.
             </p>
 
-            {/* BUTTONS */}
-            <div
-              className="
-                mt-10
-
-                flex
-                flex-wrap
-
-                gap-4
-              "
-            >
+            <div className="mt-9 flex flex-wrap gap-3">
               <Link to="/register">
-                <Button
-                  className="
-                    h-14
-                    px-7
-                    rounded-2xl
-                  "
-                >
-                  Get Started
-                  <ArrowRight size={18} />
+                <Button className="h-12 px-6 rounded-xl">
+                  Get Started <ArrowRight size={16} />
                 </Button>
               </Link>
-
               <a href="#ai-matching">
-                <Button
-                  variant="secondary"
-                  className="
-                    h-14
-                    px-7
-                    rounded-2xl
-                  "
-                >
+                <Button variant="secondary" className="h-12 px-6 rounded-xl">
                   Learn More
                 </Button>
               </a>
             </div>
 
             {/* STATS */}
-            <div
-              className="
-                mt-14
-
-                grid
-                grid-cols-3
-
-                gap-4
-                sm:gap-6
-              "
-            >
-              <div>
-                <h3
-                  className="
-                    text-3xl
-                    font-semibold
-                    text-primary
-                  "
-                >
-                  500+
-                </h3>
-
-                <p
-                  className="
-                    mt-2
-                    text-sm
-                    text-muted
-                  "
-                >
-                  Students
-                </p>
-              </div>
-
-              <div>
-                <h3
-                  className="
-                    text-3xl
-                    font-semibold
-                    text-primary
-                  "
-                >
-                  120+
-                </h3>
-
-                <p
-                  className="
-                    mt-2
-                    text-sm
-                    text-muted
-                  "
-                >
-                  Internships
-                </p>
-              </div>
-
-              <div>
-                <h3
-                  className="
-                    text-3xl
-                    font-semibold
-                    text-primary
-                  "
-                >
-                  50+
-                </h3>
-
-                <p
-                  className="
-                    mt-2
-                    text-sm
-                    text-muted
-                  "
-                >
-                  Recruiters
-                </p>
-              </div>
+            <div className="mt-12 flex items-center gap-8">
+              {[
+                { value: "500+", label: "Students" },
+                { value: "120+", label: "Internships" },
+                { value: "50+",  label: "Recruiters" },
+              ].map((s, i) => (
+                <div key={s.label} className="flex items-center gap-8">
+                  <div>
+                    <p className="text-2xl font-bold text-primary">{s.value}</p>
+                    <p className="mt-0.5 text-xs text-muted">{s.label}</p>
+                  </div>
+                  {i < 2 && <div className="w-px h-8 bg-border" />}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* RIGHT */}
-          <div
-            className="
-              relative
-              max-w-xl
-              mx-auto
-              w-full
-            "
-          >
-            <div
-              className="
-                space-y-5
-              "
-            >
-              {/* CARD 1 */}
-              <div
-                className="
-                  bg-white
-                  border
-                  border-border
+          {/* RIGHT — stacked cards */}
+          <div className="relative max-w-md mx-auto w-full">
 
-                  rounded-[32px]
+            {/* shadow card behind */}
+            <div className="absolute inset-4 bg-white border border-border rounded-[32px] rotate-2 opacity-50" />
 
-                  p-6
-                "
-              >
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                  "
-                >
-                  <div>
-                    <p
-                      className="
-                        text-sm
-                        text-muted
-                      "
-                    >
-                      AI Match Score
-                    </p>
+            <div className="relative space-y-3">
 
-                    <h3
-                      className="
-                        mt-2
-                        text-4xl
-                        font-semibold
-                        text-primary
-                      "
-                    >
-                      92%
-                    </h3>
+              {/* AI MATCH SCORE */}
+              <div className="bg-white border border-border rounded-[28px] p-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted uppercase tracking-wide">AI Match Score</p>
+                  <p className="mt-1 text-4xl font-bold text-primary">92%</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center">
+                  <Sparkles size={20} className="text-accent" />
+                </div>
+              </div>
+
+              {/* RECOMMENDED */}
+              <div className="bg-white border border-border rounded-[28px] p-5">
+                <p className="text-xs text-muted uppercase tracking-wide">Recommended Internship</p>
+                <p className="mt-2 text-lg font-semibold text-primary">Frontend Developer Intern</p>
+                <p className="mt-0.5 text-sm text-muted">Google</p>
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  {["React", "JavaScript", "UI"].map((s) => (
+                    <span key={s} className="px-3 py-1 rounded-full bg-stone text-xs text-primary">{s}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* ACTIVE APPLICATIONS */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white border border-border rounded-[28px] p-5">
+                  <p className="text-xs text-muted uppercase tracking-wide">Applications</p>
+                  <p className="mt-2 text-3xl font-bold text-primary">24</p>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <Users size={13} className="text-muted" />
+                    <span className="text-xs text-muted">Active</span>
                   </div>
-
-                  <div
-                    className="
-                      w-14
-                      h-14
-
-                      rounded-2xl
-
-                      bg-blue-50
-
-                      flex
-                      items-center
-                      justify-center
-                    "
-                  >
-                    <Sparkles
-                      className="
-                        text-accent
-                      "
-                    />
+                </div>
+                <div className="bg-white border border-border rounded-[28px] p-5">
+                  <p className="text-xs text-muted uppercase tracking-wide">Dashboard</p>
+                  <p className="mt-2 text-sm font-semibold text-primary">Manage Applicants</p>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <BriefcaseBusiness size={13} className="text-muted" />
+                    <span className="text-xs text-muted">Recruiter</span>
                   </div>
                 </div>
               </div>
 
-              {/* CARD 2 */}
-              <div
-                className="
-                  bg-white
-                  border
-                  border-border
-
-                  rounded-[32px]
-
-                  p-6
-                "
-              >
-                <p
-                  className="
-                    text-sm
-                    text-muted
-                  "
-                >
-                  Recommended Internship
-                </p>
-
-                <h3
-                  className="
-                    mt-3
-
-                    text-2xl
-                    font-semibold
-
-                    text-primary
-                  "
-                >
-                  Frontend Developer Intern
-                </h3>
-
-                <p
-                  className="
-                    mt-2
-                    text-muted
-                  "
-                >
-                  Google
-                </p>
-
-                <div
-                  className="
-                    mt-6
-
-                    flex
-                    gap-2
-                    flex-wrap
-                  "
-                >
-                  <span
-                    className="
-                      px-3
-                      py-2
-
-                      rounded-full
-
-                      bg-stone
-
-                      text-sm
-                    "
-                  >
-                    React
-                  </span>
-
-                  <span
-                    className="
-                      px-3
-                      py-2
-
-                      rounded-full
-
-                      bg-stone
-
-                      text-sm
-                    "
-                  >
-                    JavaScript
-                  </span>
-
-                  <span
-                    className="
-                      px-3
-                      py-2
-
-                      rounded-full
-
-                      bg-stone
-
-                      text-sm
-                    "
-                  >
-                    UI
-                  </span>
-                </div>
-              </div>
-
-              {/* CARD 3 */}
-              <div
-                className="
-                  bg-white
-                  border
-                  border-border
-
-                  rounded-[32px]
-
-                  p-6
-                "
-              >
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                  "
-                >
-                  <div>
-                    <p
-                      className="
-                        text-sm
-                        text-muted
-                      "
-                    >
-                      Active Applications
-                    </p>
-
-                    <h3
-                      className="
-                        mt-2
-
-                        text-4xl
-                        font-semibold
-
-                        text-primary
-                      "
-                    >
-                      24
-                    </h3>
-                  </div>
-
-                  <div
-                    className="
-                      w-14
-                      h-14
-
-                      rounded-2xl
-
-                      bg-stone
-
-                      flex
-                      items-center
-                      justify-center
-                    "
-                  >
-                    <Users size={26} />
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 4 */}
-              <div
-                className="
-                  bg-white
-                  border
-                  border-border
-
-                  rounded-[32px]
-
-                  p-6
-                "
-              >
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                  "
-                >
-                  <div>
-                    <p
-                      className="
-                        text-sm
-                        text-muted
-                      "
-                    >
-                      Recruiter Dashboard
-                    </p>
-
-                    <h3
-                      className="
-                        mt-2
-
-                        text-xl
-                        font-semibold
-
-                        text-primary
-                      "
-                    >
-                      Manage Applicants
-                    </h3>
-                  </div>
-
-                  <BriefcaseBusiness size={28} />
-                </div>
-              </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>

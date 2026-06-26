@@ -6,297 +6,124 @@ import {
   XCircle,
 } from "lucide-react";
 
-import {
-  APPLICATION_STATUS,
-} from "../../constants/applicationStatus";
+import { APPLICATION_STATUS } from "../../constants/applicationStatus";
 
-function ApplicationTimeline({
-  status,
-}) {
+const STEPS = [
+  {
+    key: APPLICATION_STATUS.APPLIED,
+    label: "Applied",
+    description: "Your application has been submitted.",
+    icon: Clock3,
+    // matches ApplicationStatusBadge: bg-blue-50 text-blue-700
+    active: { bg: "#EFF6FF", icon: "#1d4ed8", line: "#2563EB" },
+  },
+  {
+    key: APPLICATION_STATUS.SHORTLISTED,
+    label: "Shortlisted",
+    description: "Your profile passed initial screening.",
+    icon: Search,
+    // matches: bg-purple-50 text-purple-700
+    active: { bg: "#F5F3FF", icon: "#6d28d9", line: "#7c3aed" },
+  },
+  {
+    key: APPLICATION_STATUS.INTERVIEW,
+    label: "Interview",
+    description: "Recruiter moved you to interview stage.",
+    icon: MessageSquareText,
+    // matches: bg-amber-50 text-amber-700
+    active: { bg: "#FFFBEB", icon: "#b45309", line: "#d97706" },
+  },
+  {
+    key: APPLICATION_STATUS.SELECTED,
+    label: "Selected",
+    description: "Congratulations! You were selected.",
+    icon: CheckCircle2,
+    // matches: bg-green-50 text-green-700
+    active: { bg: "#F0FDF4", icon: "#15803d", line: "#16a34a" },
+  },
+];
 
-  const timelineSteps = [
-
-    {
-      key:
-        APPLICATION_STATUS.APPLIED,
-
-      label:
-        "Applied",
-
-      description:
-        "Your application has been submitted.",
-
-      icon: Clock3,
-    },
-
-    {
-      key:
-        APPLICATION_STATUS.SHORTLISTED,
-
-      label:
-        "Shortlisted",
-
-      description:
-        "Your profile passed initial screening.",
-
-      icon: Search,
-    },
-
-    {
-      key:
-        APPLICATION_STATUS.INTERVIEW,
-
-      label:
-        "Interview",
-
-      description:
-        "Recruiter moved you to interview stage.",
-
-      icon:
-        MessageSquareText,
-    },
-
-    {
-      key:
-        APPLICATION_STATUS.SELECTED,
-
-      label:
-        "Selected",
-
-      description:
-        "Congratulations! You were selected.",
-
-      icon:
-        CheckCircle2,
-    },
-  ];
-
-  // REJECTED FLOW
-  if (
-    status ===
-    APPLICATION_STATUS.REJECTED
-  ) {
-
+function ApplicationTimeline({ status }) {
+  // REJECTED
+  if (status === APPLICATION_STATUS.REJECTED) {
     return (
-      <div
-        className="
-          bg-white
-          border
-          border-border
-          rounded-[32px]
-          p-7
-        "
-      >
-
-        <div
-          className="
-            flex
-            items-start
-            gap-4
-          "
-        >
-
-          <div
-            className="
-              w-14
-              h-14
-              rounded-[22px]
-              bg-red-50
-              text-red-500
-              flex
-              items-center
-              justify-center
-              shrink-0
-            "
-          >
-
-            <XCircle
-              size={28}
-            />
-
-          </div>
-
-          <div>
-
-            <h3
-              className="
-                text-2xl
-                font-semibold
-                text-primary
-              "
-            >
-              Application Rejected
-            </h3>
-
-            <p
-              className="
-                mt-2
-                text-muted
-                leading-7
-              "
-            >
-              This application was not selected
-              for the next stage. Continue applying
-              to other opportunities.
-            </p>
-
-          </div>
-
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+          <XCircle size={20} />
         </div>
-
+        <div>
+          <p className="text-sm font-semibold text-primary">Application Rejected</p>
+          <p className="mt-0.5 text-xs text-muted leading-relaxed">
+            Not selected for the next stage. Keep applying to other opportunities.
+          </p>
+        </div>
       </div>
     );
   }
 
-  // CURRENT STEP
-  const currentIndex =
-    timelineSteps.findIndex(
-      (step) =>
-        step.key === status
-    );
+  const currentIndex = STEPS.findIndex((s) => s.key === status);
 
   return (
-    <div
-      className="
-        bg-white
-        border
-        border-border
-        rounded-[32px]
-        p-7
-      "
-    >
+    <div className="space-y-0">
+      {STEPS.map((step, index) => {
+        const isCompleted = index <= currentIndex;
+        const isCurrent   = index === currentIndex;
+        const Icon        = step.icon;
+        const isLast      = index === STEPS.length - 1;
 
-      <h2
-        className="
-          text-2xl
-          font-semibold
-          text-primary
-        "
-      >
-        Application Progress
-      </h2>
+        return (
+          <div key={step.key} className="flex items-start gap-3">
 
-      <div className="mt-8 space-y-8">
-
-        {timelineSteps.map(
-          (
-            step,
-            index
-          ) => {
-
-            const isCompleted =
-              index <=
-              currentIndex;
-
-            const Icon =
-              step.icon;
-
-            return (
+            {/* ICON + LINE column */}
+            <div className="flex flex-col items-center">
               <div
-                key={step.key}
-                className="
-                  flex
-                  items-start
-                  gap-5
-                "
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                style={
+                  isCompleted
+                    ? { background: step.active.bg }
+                    : { background: "#F0EDE7" }
+                }
               >
-
-                {/* ICON */}
-                <div
-                  className={`
-                    relative
-                    w-14
-                    h-14
-                    rounded-[22px]
-                    flex
-                    items-center
-                    justify-center
-                    shrink-0
-
-                    ${isCompleted
-
-                      ? `
-                        bg-blue-50
-                        text-accent
-                      `
-
-                      : `
-                        bg-stone
-                        text-muted
-                      `
-                    }
-                  `}
-                >
-
-                  <Icon
-                    size={24}
-                  />
-
-                  {/* LINE */}
-                  {index !==
-                    timelineSteps.length - 1 && (
-
-                    <div
-                      className={`
-                        absolute
-                        top-[56px]
-                        left-1/2
-                        -translate-x-1/2
-                        w-[2px]
-                        h-10
-
-                        ${index <
-                          currentIndex
-
-                          ? "bg-accent"
-
-                          : "bg-border"
-                        }
-                      `}
-                    />
-
-                  )}
-
-                </div>
-
-                {/* CONTENT */}
-                <div className="pt-1">
-
-                  <h3
-                    className={`
-                      text-lg
-                      font-semibold
-
-                      ${isCompleted
-
-                        ? "text-primary"
-
-                        : "text-muted"
-                      }
-                    `}
-                  >
-                    {step.label}
-                  </h3>
-
-                  <p
-                    className="
-                      mt-1
-                      text-muted
-                      leading-7
-                    "
-                  >
-                    {step.description}
-                  </p>
-
-                </div>
-
+                <Icon
+                  size={16}
+                  style={{ color: isCompleted ? step.active.icon : "#9c9489" }}
+                />
               </div>
-            );
-          }
-        )}
 
-      </div>
+              {/* connector line */}
+              {!isLast && (
+                <div
+                  className="w-0.5 flex-1 min-h-[24px] my-1 rounded-full transition-colors"
+                  style={{
+                    background: index < currentIndex ? step.active.line : "#E8E4DD",
+                  }}
+                />
+              )}
+            </div>
 
+            {/* TEXT */}
+            <div className={`pb-4 ${isLast ? "" : ""}`}>
+              <p
+                className={`text-sm font-semibold ${isCompleted ? "text-primary" : "text-muted"}`}
+              >
+                {step.label}
+                {isCurrent && (
+                  <span
+                    className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                    style={{ background: step.active.bg, color: step.active.icon }}
+                  >
+                    Current
+                  </span>
+                )}
+              </p>
+              <p className="mt-0.5 text-xs text-muted leading-relaxed">
+                {step.description}
+              </p>
+            </div>
+
+          </div>
+        );
+      })}
     </div>
   );
 }

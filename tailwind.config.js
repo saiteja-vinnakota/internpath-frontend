@@ -5,9 +5,21 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
 
+  safelist: [
+    // greens — ApplicationStatusBadge, MatchBar, ScoreBadge
+    "bg-green-50", "text-green-700", "text-green-600", "bg-green-500",
+    // blues
+    "bg-blue-50", "text-blue-700", "text-blue-600", "bg-blue-500",
+    // purples
+    "bg-purple-50", "text-purple-700", "text-purple-600",
+    // ambers
+    "bg-amber-50", "text-amber-700", "text-amber-600", "bg-amber-500",
+    // reds
+    "bg-red-50", "text-red-700", "text-red-600",
+  ],
+
   theme: {
     extend: {
-
       colors: {
         background: "#F8F7F4",
         stone: "#F0EDE7",
@@ -15,7 +27,7 @@ export default {
         primary: "#1A1916",
         muted: "#6B6760",
         accent: "#2563EB",
-        green: "#16A34A",
+        "brand-green": "#16A34A",
       },
 
       fontFamily: {
@@ -31,7 +43,6 @@ export default {
       borderRadius: {
         card: "16px",
       },
-
     },
   },
 
