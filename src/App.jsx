@@ -30,6 +30,8 @@ import EditJobPage from "./pages/recruiter/EditJobPage";
 // SHARED
 import NotificationsPage from "./pages/shared/NotificationsPage";
 import NotFoundPage from "./pages/shared/NotFoundPage";
+import PublicProfilePage from "./pages/shared/PublicProfilePage";
+
 
 import useSocket from "./hooks/useSocket";
 
@@ -174,6 +176,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/profile/:studentId" element={<PublicProfilePage />} />
 
         {/* 404 */}
         <Route path="*" element={<NotFoundPage />} />

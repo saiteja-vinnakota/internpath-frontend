@@ -28,3 +28,9 @@ export const uploadProfilePicture = async (file) => {
 
   return response.data;
 };
+
+// GET PUBLIC PROFILE 
+export const getPublicProfile = async (userId) => {
+  const response = await api.get(`/users/${userId}`);
+  return response.data;
+};
