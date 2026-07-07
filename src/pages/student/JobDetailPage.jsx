@@ -18,7 +18,13 @@ function JobDetailPage() {
   const { user } = useAuth();
   const { job, loading, error } = useJob(id);
 
-  const { matchData, loading: aiLoading, fetchScore } = useAIMatch();
+  const {
+    matchData,
+    loading: aiLoading,
+    checkCachedScore,
+    fetchScore,
+  } = useAIMatch();
+
   const {
     applications,
     fetchApplications,
@@ -35,11 +41,10 @@ function JobDetailPage() {
   // or just previously checked), serve it immediately from the backend cache
   // so the "Check Match Score" button never shows when a score already exists.
   useEffect(() => {
-    if (!isStudent || !id || !user?.resumeUrl) return;
-    fetchScore(id).catch(() => {
-      // Silently ignore — if no cache exists yet, AIMatchSection will show
-      // the "Check Match Score" button, which is the correct empty state.
-    });
+    if (!isStudent || !id || !user?.resumeUrl) {
+      return;
+    }
+    checkCachedScore(id);
   }, [isStudent, id, user?.resumeUrl]);
 
   // Fetch applications on mount for hasApplied() state
@@ -58,7 +63,10 @@ function JobDetailPage() {
       await fetchApplications();
     } else if (!matchData?.score) {
       showToast.error("Check your AI match score first, then apply.");
-      matchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      matchSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
   };
 
@@ -86,7 +94,6 @@ function JobDetailPage() {
         <ErrorState title="Failed to load job" description={error} />
       ) : (
         <div className="space-y-5">
-
           <JobDetailPanel
             job={job}
             onApply={handleApply}
@@ -105,7 +112,6 @@ function JobDetailPage() {
               />
             </div>
           )}
-
         </div>
       )}
     </DashboardLayout>

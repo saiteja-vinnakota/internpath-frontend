@@ -1,168 +1,114 @@
-import {
-  useRef,
-  useState,
-} from "react";
+import { useRef, useState } from "react";
 
-import {
-  getAIMatch,
-} from "../api/aiApi";
+import { getCachedAIMatch, generateAIMatch } from "../api/aiApi";
 
 function useAIMatch() {
+  const [score, setScore] = useState(null);
 
-  const [
+  const [matchData, setMatchData] = useState(null);
 
-    score,
+  const [loading, setLoading] = useState(false);
 
-    setScore,
+  const [error, setError] = useState("");
 
-  ] = useState(null);
+  const cacheRef = useRef({});
 
-  const [
+  // CHECK CACHE ONLY
+  const checkCachedScore = async (jobId) => {
+    if (!jobId) return null;
 
-    matchData,
+    if (cacheRef.current[jobId]) {
+      const cached = cacheRef.current[jobId];
 
-    setMatchData,
+      setScore(cached.score);
 
-  ] = useState(null);
+      setMatchData(cached);
 
-  const [
+      return cached;
+    }
 
-    loading,
+    try {
+      setLoading(true);
 
-    setLoading,
+      setError("");
 
-  ] = useState(false);
+      const response = await getCachedAIMatch(jobId);
 
-  const [
+      const data = response.data;
 
-    error,
+      setScore(data.score);
 
-    setError,
+      setMatchData(data);
 
-  ] = useState("");
+      cacheRef.current[jobId] = data;
 
-  // CACHE
-  const cacheRef =
-    useRef({});
+      return data;
+    } catch (err) {
+      // NO CACHE
+      if (err.response?.status === 404) {
+        setMatchData(null);
 
-  // FETCH AI SCORE
-  const fetchScore =
-    async (
-      jobId,
-      forceRefresh = false
-    ) => {
+        setScore(null);
 
-      try {
-
-        // INVALID
-        if (!jobId) {
-
-          return null;
-        }
-
-        // CACHE HIT
-        if (
-
-          cacheRef.current[
-            jobId
-          ] &&
-
-          !forceRefresh
-        ) {
-
-          const cachedData =
-
-            cacheRef.current[
-              jobId
-            ];
-
-          setScore(
-            cachedData.score
-          );
-
-          setMatchData(
-            cachedData
-          );
-
-          return cachedData;
-        }
-
-        setLoading(true);
-
-        setError("");
-
-        // API CALL
-        const response =
-          await getAIMatch(
-            jobId
-          );
-
-        const data =
-          response?.data;
-
-        // SAVE STATE
-        setScore(
-          data?.score || 0
-        );
-
-        setMatchData(
-          data || null
-        );
-
-        // CACHE STORE
-        cacheRef.current[
-          jobId
-        ] = data;
-
-        return data;
-
-      } catch (err) {
-
-        console.log(err);
-
-        const message =
-
-          err.response?.data
-            ?.message ||
-
-          "Failed to fetch AI score";
-
-        setError(message);
-
-        throw err;
-
-      } finally {
-
-        setLoading(false);
+        return null;
       }
-    };
 
-  // CLEAR SINGLE CACHE
-  const clearCache =
-    (jobId) => {
+      setError(err.response?.data?.message || "Failed to fetch AI score");
 
-      if (
-        cacheRef.current[
-          jobId
-        ]
-      ) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        delete
-          cacheRef.current[
-            jobId
-          ];
-      }
-    };
+  // GENERATE
+  const fetchScore = async (jobId, forceRefresh = false) => {
+    if (!jobId) return null;
 
-  // CLEAR ALL CACHE
-  const clearAllCache =
-    () => {
+    if (cacheRef.current[jobId] && !forceRefresh) {
+      const cached = cacheRef.current[jobId];
 
-      cacheRef.current = {};
-    };
+      setScore(cached.score);
+
+      setMatchData(cached);
+
+      return cached;
+    }
+
+    try {
+      setLoading(true);
+
+      setError("");
+
+      const response = await generateAIMatch(jobId);
+
+      const data = response.data;
+
+      setScore(data.score);
+
+      setMatchData(data);
+
+      cacheRef.current[jobId] = data;
+
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to generate AI score");
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearCache = (jobId) => {
+    delete cacheRef.current[jobId];
+  };
+
+  const clearAllCache = () => {
+    cacheRef.current = {};
+  };
 
   return {
-
     score,
 
     matchData,
@@ -170,6 +116,8 @@ function useAIMatch() {
     loading,
 
     error,
+
+    checkCachedScore,
 
     fetchScore,
 
